@@ -88,35 +88,39 @@ cvalidator
 case "$text" in
 "1")
 	class="Warior"
-	atk=$(expr $(( RANDOM % 5 )) + 10 )
-        hp=$(expr $(( $RANDOM % 25 )) + 100 )
-        block=$(( $RANDOM % 5 ))
-        crit=$(( $RANDOM % 5 ))
-        speed=$(( $RANDOM % 5 ))
+	atk=$(expr $(( RANDOM % 5 + 1 )) + 10 )
+	def=$(( $RANDOM % 5 + 1 ))
+        hp=$(expr $(( $RANDOM % 25 + 1 )) + 100 )
+        block=$(( $RANDOM % 5 + 1))
+        crit=$(( $RANDOM % 5 + 1 ))
+        speed=$(( $RANDOM % 5 + 1))
 
 	;;
 
 "2")
 	class="Shadow"
-	atk=$(( RANDOM % 5 ))
-        hp=$(expr $(( $RANDOM % 25 )) + 75 )
-        block=$(( $RANDOM % 5 ))
-        crit=$(expr $(( $RANDOM % 5 )) + 5 )
-        speed=$(expr $(( $RANDOM % 5 )) + 10 )
+	atk=$(( RANDOM % 5 + 1 ))
+	def=$(( $RANDOM % 5 + 1 ))
+        hp=$(expr $(( $RANDOM % 25 + 1 )) + 75 )
+        block=$(( $RANDOM % 5 + 1 ))
+        crit=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
+        speed=$(expr $(( $RANDOM % 5 + 1 )) + 10 )
 
 	;;
 "3")
 	class="Defender"
-	atk=$(expr $(( RANDOM % 5 )) + 5 )
-        hp=$(expr $(( $RANDOM % 25 )) + 125 )
-	block=$(expr $(( $RANDOM % 5 )) + 5 )
+	atk=$(( RANDOM % 5 + 1 ))
+	def=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
+        hp=$(expr $(( $RANDOM % 25 + 1 )) + 125 )
+	block=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
         crit=0
-        speed=$(( $RANDOM % 5 ))
+        speed=$(( $RANDOM % 5 + 1))
 
 	;;
 "4")
 	class="none"
 	atk=$(expr $(( RANDOM % 5 )) + 5 )
+	def=$(( $RANDOM % 5 ))
 	hp=$(expr $(( $RANDOM % 25 )) + 100 )
 	block=$(( $RANDOM % 5 ))
 	crit=$(( $RANDOM % 5 ))
@@ -136,6 +140,12 @@ echo "crit:	+$critch%"
 echo "block:	+$blockch%"
 echo "speed:	$speed"
 echo ""
+bhp=$hp
+batk=$atk
+bdef=$def
+bcrit=$critch
+bblockch=$blockch
+bspeed=$speed
 }
 function mod()
 {
@@ -154,9 +164,9 @@ case "$level" in
 
        
 	"hard")
-eatk=$(( $RANDOM % 10 + 5 ))
-edef=$(( $RANDOM % 15 + 5 ))
-ehp=$(expr $(( RANDOM % 25 )) + 125 )
+eatk=$(expr $(( $RANDOM % 5 + 1 )) + 10 )
+edef=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
+ehp=$(expr $(( RANDOM % 25 + 1 )) + 125 )
 enblock=$(( RANDOM % 5 + 1 ))
 encrit=$(( RANDOM % 5 + 1 ))
 enspeed=$(( $RANDOM % 10 + 5 ))
@@ -164,21 +174,21 @@ let "h+=1"
 let "score+=1"
 ;;
 "medium")
-eatk=$(( $RANDOM % 5 + 5 ))
-edef=$(( $RANDOM % 10 + 5 ))
-ehp=$(expr $(( RANDOM % 25 )) + 100 )
+eatk=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
+edef=$(( $RANDOM % 5 + 1 ))
+ehp=$(expr $(( RANDOM % 25 + 1 )) + 100 )
 enblock=$(( RANDOM % 3 + 1 ))
-encrit=$(( RANDOM % 3 + 1 ))
-enspeed=$(( $RANDOM % 10 ))
+encrit=$(( RANDOM % 5 + 1 ))
+enspeed=$(expr $(( $RANDOM % 5 )) + 5 )
 let "m+=1"
 ;;
 "easy")
 eatk=$(( $RANDOM % 5 + 1 ))
-edef=$(( $RANDOM % 7 + 5 ))
-ehp=$(expr $(( RANDOM % 25 )) + 75 )
-enblock=$(( $RANDOM % 3 ))
-encrit=$(( $RANDOM % 3 ))
-enspeed=$(( $RANDOM % 5 ))
+edef=$(( $RANDOM % 3 ))
+ehp=$(expr $(( RANDOM % 25 + 1)) + 75 )
+enblock=$(( $RANDOM % 2 + 1 ))
+encrit=$(( $RANDOM % 2 + 1))
+enspeed=$(( $RANDOM % 3 + 1))
 let "e+=1"
 let "score-=1"
 esac
@@ -186,23 +196,28 @@ echo ""
 echo "Enemy stats"
 echo "hp:	$ehp"
 echo "atk:	$eatk"
-echo "def:	$def"
+echo "def:	$edef"
 echo "crit:	+$(expr $encrit * 5 )%"
 echo "block:	+$(expr $enblock * 5 )%"
 echo "speed:	$enspeed"
 echo ""
+behp=$ehp
+beatk=$eatk
+bedef=$edef
+bencrit=$encrit
+benblock=$enblock
+benspeed=$enspeed
 }
 
 function run ()
 {
         echo "Do you really want to run?"
         read -e text
-	validator
-        if [[ $text = "yes" ]]
-                then
+	case "$text" in
+		"yes")
 
-                hspeed=$(expr $(( $RANDOM % 15 )) + $speed )
-                espeed=$(expr $(( $RANDOM % 15 )) + $enspeed )
+                hspeed=$(expr $(( $RANDOM % 15 + 1 )) + $speed )
+                espeed=$(expr $(( $RANDOM % 15 + 1)) + $enspeed )
                 echo "Checking if you are able to escape"
                 sleep 2s
                 if [[ $hspeed -lt $espeed ]]
@@ -210,7 +225,7 @@ function run ()
                         then echo "You aren't able to runaway!!!"
                         echo -e "\033Enemy has an extra opurtinity to attack you\033[1;0m"
                         sleep 1s
-                        edmg=$(expr $(( $RANDOM % 15  )) + $eatk )
+                        edmg=$(expr $(( $RANDOM % 15 + 1 )) + $eatk )
                         echo "Enemy deals $edmg dmg"
                         hp=$(expr $hp - $edmg )
                         echo "Your hero has $hp hp left"
@@ -228,42 +243,42 @@ function run ()
                         echo -e "\033[1;5;33mYou runaway fast!!!\033[1;0m"
                         let "run+=1"
                         let "score-=1"
-                        return 2
-
+			cont
                 fi
-        else
-        battle
-        fi
+		;;
+          "no")
+
+	battle
+
+	esac
+        
 }
 
-Efightoption ()
+function Efightoption ()
 
         {
 
 
-                eoption=$(( $Random %3 + 1))
+                eoption=$(( $RANDOM % 3 + 1 ))
                 while [[ $eoption > 3 ]]
                 do
-                        eoption=$(( $Random %3 + 1))
+                        eoption=$(( $RANDOM % 3 + 1 ))
                 done
 
-        case "$option" in
+   	     case "$eoption" in
                 "1")
                 echo "Enemy tries to Power Attack your hero!"
-                       EPatt=5
-                       EPcrt=3
-                       EPspeed=5
-                       EPblock=3
+		emod="pow"
+sleep 1s
                         ;;
                 "2")
                         echo "Enemy tries to Normal Attack your hero!"
+			sleep 1s
                         ;;
                 "3")
                         echo "Enemy tries to Fast Attack your hero!"
-                       EFatt=5
-                       EFcrt=3
-                       EFspeed=5
-                       EFblock=5
+                      emod="fast"
+		      sleep 1s
                         ;;
         esac
         }
@@ -272,14 +287,12 @@ function Fightoption ()
         {
         echo "Choose your action"
         echo "1.Power Attack, 2 Normal Attack, 3.Fast Attack,4.Run. Type 1,2,3 or 4."
+	read -e text
         cvalidator
         case "$text" in
                 "1")
+			mod="pow"
                         echo "Your hero tries to Power Attack an enemy!"
-                        Patt=5
-                        Pcrt=3
-                        Pspeed=5
-                        Pblock=3
                         sleep 1s
                         ;;
                 "2")
@@ -288,11 +301,8 @@ function Fightoption ()
                         ;;
 
                 "3")
+			mod="fast"
                         echo "Your hero tries to Fast Attack an enemy!"
-                        Fatt=5
-                        Fcrt=3
-                        Fspeed=5
-                        Fblock=5
                         sleep 1s
                         ;;
                 "4")
@@ -312,32 +322,80 @@ round=1
 	sleep 2s
 function battle ()
 {
-Fightoption
-Efightoption
 while [ "$hp" > 0 ]
 do 
+	echo "round $round"
+	#stats reset
+        atk=$batk
+        def=$bdef
+        critch=$bcrit
+        blockch=$bblockch
+        speed=$bspeed
+        eatk=$beatk
+        edef=$bedef
+        encrit=$bencrit
+        enblock=$benblock
+        enspeed=$benspeed
+
+
+
+Fightoption
+Efightoption
 
 	hdmg1=0
 	hdmg2=0
 	edmg1=0
 	edmg2=0
-	#hcrit=$(expr $(( $RANDOM % 20 + 1 )) + $crit )
-	#ecrit=$(expr $(( $RANDOM % 20 + 1 )) + $encrit )
-	#hblock=$(expr $(( $RANDOM % 20 + 1)) + $block )
-	#eblock=$(expr $(( $RANDOM % 20 + 1)) + $enblock  )
-	#hspeed=$(expr $(( $RANDOM % 15 )) + $speed )
-        #espeed=$(expr $(( $RANDOM % 15 )) + $enspeed )
-	hcrit=$(expr $(( $RANDOM % 20 + 1 )) + $crit + $Pcrt - $Fcrt )
-        ecrit=$(expr $(( $RANDOM % 20 + 1 )) + $encrit + $EPcrit - $EFcrt )
-        hblock=$(expr $(( $RANDOM % 20 + 1)) + $block - $Pblock - $FBlock)
-        eblock=$(expr $(( $RANDOM % 20 + 1)) + $enblock - $Fblock -$EFblock)
-        hspeed=$(expr $(( $RANDOM % 15 )) + $speed + $Fspeed - $Pspeed )
-        espeed=$(expr $(( $RANDOM % 15 )) + $enspeed + $EFspeed - $EPspeed )
-        declare -i hdmg=$(expr $(( $RANDOM % 15 + 1 )) + $atk + $Patt - $Fatt )
-        declare -i edmg=$(expr $(( $RANDOM % 15 + 1 )) + $eatk + $EPatt - $EFatt )
+	hcrit=$(expr $(( $RANDOM % 20 + 1 )) + $crit )
+	ecrit=$(expr $(( $RANDOM % 20 + 1 )) + $encrit )
+	hblock=$(expr $(( $RANDOM % 20 + 1 )) + $block ) 
+	eblock=$(expr $(( $RANDOM % 20 + 1 )) + $enblock )
+	hspeed=$(expr $(( $RANDOM % 15 + 1 )) + $speed ) 
+	espeed=$(expr $(( $RANDOM % 15 + 1 )) + $enspeed )	
+	case $mod in
+		"fast")
+			let "hspeed+=5"
+			let "atk-=5"
+			let "hcrit-=3"
+			let "eblock-=3"
+	;;
+		"pow")
+			let "atk+=5"
+			let "hcrit+=3"
+			let "hspeed-=5"
+			let "eblock+=3"
+	;;
+	esac
 
-	declare -i hdmg=$(expr $(( $RANDOM % 15 + 1 )) + $atk )
-	declare -i edmg=$(expr $(( $RANDOM % 15 + 1 )) + $eatk )
+	case $emod in
+		"fast")
+			let "espeed+=5"
+			let "hblock-=3"
+			let "ecrit-=3"
+			let "eatk-=5"
+		;;
+		"pow")
+			let "eatk+=5"
+			let "ecrit+=3"
+			let "espeed-=5"
+			let "hblock+=3"
+		;;
+ 	esac
+
+	if [[ $def -gt 0 ]]
+
+	then
+	    	def=$(( $RANDOM % $def + 1 ))
+		eatk=$(expr $eatk - $def )
+	fi
+	if [[ $edef -gt 0 ]] 
+	then	
+		edef=$(( $RANDOM % $edefa + 1 ))
+		atk=$(expr $atk - $edef )
+	fi
+
+	declare -i hdmg=$(expr $(( $RANDOM % 15 + 1 )) + $atk ) 
+	declare -i edmg=$(expr $(( $RANDOM % 15 + 1 )) + $eatk ) 
 	echo "round $round"
 	echo ""
 if [[ "$eblock" -lt 20 ]];
@@ -350,6 +408,15 @@ if [[ "$eblock" -lt 20 ]];
                 hcrit2=$(expr $(( $RANDOM % 20 + 1 )) + $crit )
                 declare -i hdmg1=$(expr $(( $RANDOM % 15 + 1 )) + $atk )
                 declare -i hdmg2=$(expr $(( $RANDOM % 15 + 1 )) + $atk )
+				if [[ $hdmg1 -le 0 ]]
+                                        then
+                                        hdmg1=$(( $RANDOM % 5 + 1 ))
+                                fi
+                                if [[ $hdmg2 -le 0 ]]
+                                        then
+                                        hdmg2=$(( $RANDOM % 5 + 1 ))
+                                fi
+
                         if [[ "$hcrit1" -ge 20 ]]
                         then
                         echo -e "\033[1;32mHero 1st attack is a crit\033[1;0m"
@@ -398,8 +465,17 @@ if [[ "$eblock" -lt 20 ]];
 			sleep 1s
 			ecrit1=$(expr $(( $RANDOM % 20 + 1 )) + $encrit )
 			ecrit2=$(expr $(( $RANDOM % 20 + 1 )) + $encrit )
-			declare -i edmg1=$(expr $(( $RANDOM % 15  )) + $eatk )
-			declare -i edmg2=$(expr $(( $RANDOM % 15  )) + $eatk )
+			declare -i edmg1=$(expr $(( $RANDOM % 15 + 1 )) + $eatk )
+			declare -i edmg2=$(expr $(( $RANDOM % 15 + 1  )) + $eatk )
+				if [[ $edmg1 -le 0 ]]
+					then
+					edmg1=$(( $RANDOM % 5 + 1 ))	
+				fi
+				if [[ $edmg2 -le 0 ]]
+					then
+                                        edmg2=$(( $RANDOM % 5 + 1 ))
+				fi
+			else
 				if [[ "$ecrit1" -ge 20 ]]
 
 				then
@@ -450,6 +526,10 @@ if [[ "$eblock" -lt 20 ]];
 		echo "Total $hdmg dmg"
 		sleep 1s
 	else	
+		if [[ $hdmg -lt 0 ]]
+		then
+			hdmg=$(( $RANDOM % 5 + 1 ))
+		fi
 		echo "Your hero deals $hdmg dmg"
 		sleep 1s
 	fi
@@ -459,6 +539,10 @@ if [[ "$eblock" -lt 20 ]];
 		echo "Total $edmg dmg"
 		sleep 1s
 	else
+		if [[ $edmg -lt 0 ]]
+		then
+			edmg=$(( $RANDOM % 5 + 1 ))
+		fi
 		echo "Enemy deals $edmg dmg"
 		sleep 1s
 	fi
@@ -484,8 +568,7 @@ if [[ "$eblock" -lt 20 ]];
 		let "score+=3"
 		return 0
 	fi
-	
-fi
+
 
 
 done
@@ -500,27 +583,26 @@ text=0
 read -e text
 
 validator
-}
-end()
-{
-while [[ $text = "yes" ]]
-do
+case "$text" in
+	"yes")
 
         let "enemy+=1"
         hero
-        mod
-        walka
-        if [[ $enemy -lt 5 ]]
-        then
+   	mod 
+	walka
         echo "The game will automatically end after five fights"
         echo "Current fight nr $enemy"
         echo "Do you want to fight with a next enemy? (yes/no)"
         read -e text
 	validator
-        else
-                text="no"
-        fi
-done
+	cont
+	;;
+	"no")
+	ending
+	esac
+}
+ending()
+{
         echo "$name Thanks for playing"
         echo "Your record:"
         echo "$win Wins, $loose Losts, $run Runaways"
@@ -553,7 +635,6 @@ done
 	exit 0
 	esac
 }
-
 gra()
 
 {
@@ -563,7 +644,7 @@ hero
 mod
 walka
 cont
-end
+ending
 }
 
 gra
