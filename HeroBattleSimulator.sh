@@ -475,7 +475,7 @@ if [[ "$eblock" -lt 20 ]];
 					then
                                         edmg2=$(( $RANDOM % 5 + 1 ))
 				fi
-			else
+			
 				if [[ "$ecrit1" -ge 20 ]]
 
 				then
