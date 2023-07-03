@@ -193,6 +193,115 @@ echo "speed:	$enspeed"
 echo ""
 }
 
+function run ()
+{
+        echo "Do you really want to run?"
+        read -text
+	validator
+        if [[ $text = "yes" ]]
+                then
+
+                hspeed=$(expr $(( $RANDOM % 15 )) + $speed )
+                espeed=$(expr $(( $RANDOM % 15 )) + $enspeed )
+                echo "Checking if you are able to escape"
+                sleep 2s
+                if [[ $hspeed -lt $espeed ]]
+
+                        then echo "You aren't able to runaway!!!"
+                        echo -e "\033Enemy has an extra opurtinity to attack you\033[1;0m"
+                        sleep 1s
+                        edmg=$(expr $(( $RANDOM % 15  )) + $eatk )
+                        echo "Enemy deals $edmg dmg"
+                        hp=$(expr $hp - $edmg )
+                        echo "Your hero has $hp hp left"
+
+                                if [[ "$hp" -lt 0 ]]
+                                then
+                                echo -e "\033[1;5;41mYou loose a battle!!!\033[1;0m"
+                                let "loose+=1"
+                                let "score-=3"
+                                return 1
+                                fi
+                         echo ""
+
+                else
+                        echo -e "\033[1;5;33mYou runaway fast!!!\033[1;0m"
+                        let "run+=1"
+                        let "score-=1"
+                        return 2
+
+                fi
+        else
+        battle
+        fi
+}
+
+Function Efightoption ()
+
+        {
+
+
+                eoption=$(( $Random %3 + 1))
+                while [[ $eoption > 3 ]]
+                do
+                        eoption=$(( $Random %3 + 1))
+                done
+
+        case "$option" in
+                "1")
+                echo "Enemy tries to Power Attack your hero!"
+                       EPatt=5
+                       EPcrt=3
+                       EPspeed=5
+                       EPblock=3
+                        ;;
+                "2")
+                        echo "Enemy tries to Normal Attack your hero!"
+                        ;;
+                "3")
+                        echo "Enemy tries to Fast Attack your hero!"
+                       EFatt=5
+                       EFcrt=3
+                       EFspeed=5
+                       EFblock=5
+                        ;;
+        esac
+        }
+
+function Fightoption ()
+        {
+        echo "Choose your action"
+        echo "1.Power Attack, 2 Normal Attack, 3.Fast Attack,4.Run. Type 1,2,3 or 4."
+        cvalidator
+        case "$text" in
+                "1")
+                        echo "Your hero tries to Power Attack an enemy!"
+                        Patt=5
+                        Pcrt=3
+                        Pspeed=5
+                        Pblock=3
+                        sleep 1s
+                        ;;
+                "2")
+                        echo "Your hero tries to Normal Attack an enemy!"
+                        sleep 1s
+                        ;;
+
+                "3")
+                        echo "Your hero tries to Fast Attack an enemy!"
+                        Fatt=5
+                        Fcrt=3
+                        Fspeed=5
+                        Fblock=5
+                        sleep 1s
+                        ;;
+                "4")
+                run
+                        ;;
+                esac
+        }
+
+
 
 function walka ()
 
@@ -201,18 +310,32 @@ echo "Fight nr $enemy begins!"
 echo ""
 round=1
 	sleep 2s
+function battle ()
+{
+Fightoption
+Efightoption
 while [ "$hp" > 0 ]
 do 
+
 	hdmg1=0
 	hdmg2=0
 	edmg1=0
 	edmg2=0
-	hcrit=$(expr $(( $RANDOM % 20 + 1 )) + $crit )
-	ecrit=$(expr $(( $RANDOM % 20 + 1 )) + $encrit )
-	hblock=$(expr $(( $RANDOM % 20 + 1)) + $block )
-	eblock=$(expr $(( $RANDOM % 20 + 1)) + $enblock  )
-	hspeed=$(expr $(( $RANDOM % 15 )) + $speed )
-        espeed=$(expr $(( $RANDOM % 15 )) + $enspeed )
+	#hcrit=$(expr $(( $RANDOM % 20 + 1 )) + $crit )
+	#ecrit=$(expr $(( $RANDOM % 20 + 1 )) + $encrit )
+	#hblock=$(expr $(( $RANDOM % 20 + 1)) + $block )
+	#eblock=$(expr $(( $RANDOM % 20 + 1)) + $enblock  )
+	#hspeed=$(expr $(( $RANDOM % 15 )) + $speed )
+        #espeed=$(expr $(( $RANDOM % 15 )) + $enspeed )
+	hcrit=$(expr $(( $RANDOM % 20 + 1 )) + $crit + $Pcrt - $Fcrt )
+        ecrit=$(expr $(( $RANDOM % 20 + 1 )) + $encrit + $EPcrit - $EFcrt )
+        hblock=$(expr $(( $RANDOM % 20 + 1)) + $block - $Pblock - $FBlock)
+        eblock=$(expr $(( $RANDOM % 20 + 1)) + $enblock - $Fblock -$EFblock)
+        hspeed=$(expr $(( $RANDOM % 15 )) + $speed + $Fspeed - $Pspeed )
+        espeed=$(expr $(( $RANDOM % 15 )) + $enspeed + $EFspeed - $EPspeed )
+        declare -i hdmg=$(expr $(( $RANDOM % 15 + 1 )) + $atk + $Patt - $Fatt )
+        declare -i edmg=$(expr $(( $RANDOM % 15 + 1 )) + $eatk + $EPatt - $EFatt )
+
 	declare -i hdmg=$(expr $(( $RANDOM % 15 + 1 )) + $atk )
 	declare -i edmg=$(expr $(( $RANDOM % 15 + 1 )) + $eatk )
 	echo "round $round"
@@ -405,6 +528,7 @@ fi
 
 
 done
+}
 }
 cont()
 {
