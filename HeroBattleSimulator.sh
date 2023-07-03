@@ -196,7 +196,7 @@ echo ""
 function run ()
 {
         echo "Do you really want to run?"
-        read -text
+        read -e text
 	validator
         if [[ $text = "yes" ]]
                 then
@@ -236,7 +236,7 @@ function run ()
         fi
 }
 
-Function Efightoption ()
+Efightoption ()
 
         {
 
