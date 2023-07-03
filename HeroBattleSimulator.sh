@@ -484,51 +484,13 @@ if [[ "$eblock" -lt 20 ]];
 		let "score+=3"
 		return 0
 	fi
-	echo "Do you want to continue? (yes/no)"
-	echo ""
-	surr=0
-	read -e text
-	echo ""
-	validator
 	
-	if [[ $text = "no" ]]
-	then
-    	
-		hspeed=$(expr $(( $RANDOM % 15 )) + $speed ) 
-		espeed=$(expr $(( $RANDOM % 15 )) + $enspeed )
-		echo "Checking if you are able to escape"
-		sleep 2s
-	if [[ $hspeed -lt $espeed ]]
-		 
-		then echo "You aren't able to runaway!!!"
-		echo -e "\033Enemy has an extra opurtinity to attack you\033[1;0m"
-		sleep 1s
-		edmg=$(expr $(( $RANDOM % 15  )) + $eatk )
-		echo "Enemy deal $edmg dmg"
-		hp=$(expr $hp - $edmg )
-		echo "Your hero has $hp hp left"
-
-        if [[ "$hp" -lt 0 ]]
-        then
-                echo -e "\033[1;5;41mYou loose a battle!!!\033[1;0m"
-                let "loose+=1"
-                let "score-=3"
-		return 1
-	fi
-	echo ""
-
-	else
-		echo -e "\033[1;5;33mYou runaway fast!!!\033[1;0m"
-		let "run+=1"	
-		let "score-=1"
-		return 2
-	
-	fi
 fi
 
 
 done
 }
+battle
 }
 cont()
 {
