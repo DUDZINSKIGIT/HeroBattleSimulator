@@ -415,7 +415,6 @@ Efightoption
 
 	declare -i hdmg=$(expr $(( $RANDOM % 15 + 1 )) + $atk ) 
 	declare -i edmg=$(expr $(( $RANDOM % 15 + 1 )) + $eatk ) 
-	echo "round $round"
 	echo ""
 if [[ "$eblock" -lt 20 ]];
         then
