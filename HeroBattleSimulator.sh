@@ -586,6 +586,8 @@ if [[ "$eblock" -lt 20 ]];
 		let "score+=3"
 		if [[ $boss -gt 0 ]]
 		then	
+			echo " "
+			reward
 			echo" "
 			reward
 			echo " "
@@ -593,6 +595,8 @@ if [[ "$eblock" -lt 20 ]];
 			echo " "
 			boss=0
 		fi
+		echo " "
+		reward
 		echo " "
 		reward
 		echo " "
