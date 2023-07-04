@@ -43,19 +43,27 @@ echo "Shadow:"
 echo "High	Crit,Speed"
 echo "low	Attack,HP"
 echo "Defender:"
-echo "High	HP,Block"
-echo "Low	Crit,Speed"
+echo "High	HP,Block,Defence"
+echo "Low	Attack,Crit,Speed"
+echo " "
+echo "Action Guide"
+echo "Power Attack:High Possible DMG and CRIT, EASY to block and Slow"
+echo "Normal Attack:No modificators, Just normal attack"
+echo "Fast Attack:Low Possible DMG and CRIT, HARD to block and Fast"
+echo "RUN: Chance to flee from a fight; if fails, an enemy has an extra attack roll on you"
 echo " "
 echo "Score guide"
-echo "Dificulty: Hard:1, Medium:0, Easy:-1"
+echo "BOSS encounter:+3"
 echo "Result: Win:3, Lost:-3, Escape:-1"
+echo "Treasure: Big:3 Medium:2 Small:1"
 echo ""
 sleep 2
 ;;
 "no")
 	echo ""
 esac
-
+key=0
+boss=0
 h=0
 m=0
 e=0
@@ -67,7 +75,7 @@ atk=0
 block=0
 ns=0
 nsh=0
-enemy=1
+fight=1
 win=0
 loose=0
 run=0
@@ -130,70 +138,81 @@ case "$text" in
 esac
 
 echo ""
-echo "Your hero stats"
 critch=$(expr 5 * $crit )
 blockch=$(expr 5 * $block  )
+function hstats ()
+{
+echo "Your hero stats"
 echo "hp:	$hp"
-echo "atk:	$atk"
-echo "def:	$def"
-echo "crit:	+$critch%"
-echo "block:	+$blockch%"
-echo "speed:	$speed"
-echo ""
+echo "atk:	$batk"
+echo "def:	$bdef"
+echo "crit:	+$(expr $bcrit * 5 )%"
+echo "block:	+$(expr $bblock * 5 )%"
+echo "speed:	$bspeed"
+}
 bhp=$hp
 batk=$atk
 bdef=$def
-bcrit=$critch
-bblockch=$blockch
+bcrit=$crit
+bblock=$block
 bspeed=$speed
+hstats
+echo " "
 }
 function mod()
 {
+	
+if [[ $key -gt 0 ]]
+then
+echo "$name has a golden key"
+echo "Do you want to fight with a BOSS enemy?"
+read -e text
+validator
+case "$text" in
+	"yes")
+		sleep 1s
+		let "key-=1"
+		boss=1
+		echo "Brace yourself BOSS is comming"
+		sleep 1s
+		;;
+	"no")
+		echo "Maybe next time..."
+	;;
+esac
+fi
+echo "$name searches for an enemy"
+sleep 2s
+case "$boss" in
 
-	echo "Choose difficulty level (hard/medium/easy)"
-level=0
-read -e level
-echo ""
-while [ "$level" != "hard" ] && [ "$level" != "medium" ] && [ "$level" != "easy" ]
-do 
-	echo "Not the correct choice: type hard, medium, or easy"
-	read -e level
-done
+	"1")
+echo -e "The BOSS Appears"
+sleep 1s
+enemy=$(shuf -n 1 boss.txt )
+eatk=$(expr $(( $RANDOM % 5 + 1 )) + 15 )
+edef=$(expr $(( $RANDOM % 5 + 1 )) + 10 )
+ehp=$(expr $(( RANDOM % 25 + 1 )) + 150 )
+enblock=$(expr $(( RANDOM % 5 + 1 )) + 5 )
+encrit=$(expr $(( RANDOM % 5 + 1 )) + 5 )
+enspeed=$(( RANDOM % 10 + 1 ))
+let "score+=5"
+sleep 1s
+;;
 
-case "$level" in
-
-       
-	"hard")
-eatk=$(expr $(( $RANDOM % 5 + 1 )) + 10 )
-edef=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
-ehp=$(expr $(( RANDOM % 25 + 1 )) + 125 )
+	"0")
+echo "An enemy appears"
+sleep 1s
+enemy=$(shuf -n 1 enemy.txt )
+eatk=$(( $RANDOM % 15 + 1 ))
+edef=$(( $RANDOM % 10 + 1 ))
+ehp=$(( RANDOM % 100 + 1 ))
 enblock=$(( RANDOM % 5 + 1 ))
 encrit=$(( RANDOM % 5 + 1 ))
-enspeed=$(( $RANDOM % 10 + 5 ))
-let "h+=1"
-let "score+=1"
-;;
-"medium")
-eatk=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
-edef=$(( $RANDOM % 5 + 1 ))
-ehp=$(expr $(( RANDOM % 25 + 1 )) + 100 )
-enblock=$(( RANDOM % 3 + 1 ))
-encrit=$(( RANDOM % 5 + 1 ))
-enspeed=$(expr $(( $RANDOM % 5 )) + 5 )
-let "m+=1"
-;;
-"easy")
-eatk=$(( $RANDOM % 5 + 1 ))
-edef=$(( $RANDOM % 3 ))
-ehp=$(expr $(( RANDOM % 25 + 1)) + 75 )
-enblock=$(( $RANDOM % 2 + 1 ))
-encrit=$(( $RANDOM % 2 + 1))
-enspeed=$(( $RANDOM % 3 + 1))
-let "e+=1"
-let "score-=1"
+enspeed=$(( $RANDOM % 15 + 1 ))
+sleep 1s
 esac
 echo ""
-echo "Enemy stats"
+echo "$enemy"
 echo "hp:	$ehp"
 echo "atk:	$eatk"
 echo "def:	$edef"
@@ -223,24 +242,24 @@ function run ()
                 if [[ $hspeed -lt $espeed ]]
 
                         then echo "You aren't able to runaway!!!"
-                        echo -e "\033Enemy has an extra opurtinity to attack you\033[1;0m"
+                        echo -e "\033$enemy has an extra opurtinity to attack $name\033[1;0m"
                         sleep 1s
                         edmg=$(expr $(( $RANDOM % 15 + 1 )) + $eatk )
-                        echo "Enemy deals $edmg dmg"
+                        echo "$enemy deals $edmg dmg"
                         hp=$(expr $hp - $edmg )
                         echo "Your hero has $hp hp left"
 
                                 if [[ "$hp" -lt 0 ]]
                                 then
-                                echo -e "\033[1;5;41mYou loose a battle!!!\033[1;0m"
+                                echo -e "\033[1;5;41m$name loose a battle!!!\033[1;0m"
                                 let "loose+=1"
                                 let "score-=3"
-                                return 1
+			ending
                                 fi
                          echo ""
 
                 else
-                        echo -e "\033[1;5;33mYou runaway fast!!!\033[1;0m"
+                        echo -e "\033[1;5;33m$name runaway fast!!!\033[1;0m"
                         let "run+=1"
                         let "score-=1"
 			cont
@@ -267,16 +286,16 @@ function Efightoption ()
 
    	     case "$eoption" in
                 "1")
-                echo "Enemy tries to Power Attack your hero!"
+                echo "$enemy tries to Power Attack your hero!"
 		emod="pow"
 sleep 1s
                         ;;
                 "2")
-                        echo "Enemy tries to Normal Attack your hero!"
+                        echo "$enemy tries to Normal Attack your hero!"
 			sleep 1s
                         ;;
                 "3")
-                        echo "Enemy tries to Fast Attack your hero!"
+                        echo "$enemy tries to Fast Attack your hero!"
                       emod="fast"
 		      sleep 1s
                         ;;
@@ -292,17 +311,17 @@ function Fightoption ()
         case "$text" in
                 "1")
 			mod="pow"
-                        echo "Your hero tries to Power Attack an enemy!"
+                        echo "$name tries to Power Attack an enemy!"
                         sleep 1s
                         ;;
                 "2")
-                        echo "Your hero tries to Normal Attack an enemy!"
+                        echo "$name tries to Normal Attack an enemy!"
                         sleep 1s
                         ;;
 
                 "3")
 			mod="fast"
-                        echo "Your hero tries to Fast Attack an enemy!"
+                        echo "$name tries to Fast Attack an enemy!"
                         sleep 1s
                         ;;
                 "4")
@@ -316,7 +335,7 @@ function Fightoption ()
 function walka ()
 
 {
-echo "Fight nr $enemy begins!"
+echo "Fight nr $fight begins!"
 echo ""
 round=1
 	sleep 2s
@@ -328,8 +347,8 @@ do
 	#stats reset
         atk=$batk
         def=$bdef
-        critch=$bcrit
-        blockch=$bblockch
+        crit=$bcrit
+        block=$bblock
         speed=$bspeed
         eatk=$beatk
         edef=$bedef
@@ -402,7 +421,7 @@ if [[ "$eblock" -lt 20 ]];
         then
 		if [[ "$hspeed" -ge $(expr $espeed * 2 ) ]]
                 then
-                echo -e "\033[1;32mYour hero attacks an enemy twice\033[1;0m"
+                echo -e "\033[1;32m$name attacks an enemy twice\033[1;0m"
 		sleep 1s
                 hcrit1=$(expr $(( $RANDOM % 20 + 1 )) + $crit )
                 hcrit2=$(expr $(( $RANDOM % 20 + 1 )) + $crit )
@@ -419,7 +438,7 @@ if [[ "$eblock" -lt 20 ]];
 
                         if [[ "$hcrit1" -ge 20 ]]
                         then
-                        echo -e "\033[1;32mHero 1st attack is a crit\033[1;0m"
+                        echo -e "\033[1;32m$name 1st attack is a crit\033[1;0m"
                         sleep 1s
 			if [[ "hdmg1" -lt 10 ]]
 			then
@@ -429,7 +448,7 @@ if [[ "$eblock" -lt 20 ]];
                         fi
                         if [[ "$hcrit2" -ge 20 ]]
                         then
-                        echo -e "\033[1;32mHero 2nd attack is a crit\033[1;0m"
+                        echo -e "\033[1;32m$name 2nd attack is a crit\033[1;0m"
                         sleep 1s
 			if [[ "hdmg2" -lt 10 ]]
                         then
@@ -448,12 +467,12 @@ if [[ "$eblock" -lt 20 ]];
 			fi
 
 			let hdmg=$(expr $hdmg * 2 )
-                        echo -e "\033[1;32mYour hero lands the critcal attack\033[1;0m"
+                        echo -e "\033[1;32m$name lands the critcal attack\033[1;0m"
 			sleep 1s
 		fi
         else
              hdmg=0
-                echo -e "\033[1;31mEnemy blocks your attack\033[1;0m"
+                echo -e "\033[1;31m$enemy blocks your attack\033[1;0m"
 		sleep 1s
         fi
 	if [[ "$hblock" -lt 20 ]];
@@ -461,7 +480,7 @@ if [[ "$eblock" -lt 20 ]];
 			
 		if [[ "$espeed" -ge $(expr $hspeed * 2 ) ]]
 			then
-			echo -e "\033[1;31mEnemy attacks your hero twice\033[1;0m"
+			echo -e "\033[1;31m$enemy attacks your hero twice\033[1;0m"
 			sleep 1s
 			ecrit1=$(expr $(( $RANDOM % 20 + 1 )) + $encrit )
 			ecrit2=$(expr $(( $RANDOM % 20 + 1 )) + $encrit )
@@ -479,7 +498,7 @@ if [[ "$eblock" -lt 20 ]];
 				if [[ "$ecrit1" -ge 20 ]]
 
 				then
-				echo -e "\033[1;31mEnemy 1st attack is a crit\033[1;0m"
+				echo -e "\033[1;31m$enemy 1st attack is a crit\033[1;0m"
 				sleep 1s
 					if [[ "$edmg1" -lt 10 ]]
                               		then
@@ -490,7 +509,7 @@ if [[ "$eblock" -lt 20 ]];
 				fi
 				if [[ "$ecrit2" -ge 20 ]]
 				then
-					echo  -e "\033[1;31mEnemy 2nd attack is a crit\033[1;0m"
+					echo  -e "\033[1;31m$enemy 2nd attack is a crit\033[1;0m"
                 			sleep 1s
 					if [[ "$edmg2" -lt 10 ]]
                                 	then
@@ -509,12 +528,12 @@ if [[ "$eblock" -lt 20 ]];
 			fi
 					
 			let edmg=$(expr $edmg * 2 )
-                        echo -e "\033[1;31mEnemy lands the critcal attack\033[1;0m"
+                        echo -e "\033[1;31m$enemy lands the critcal attack\033[1;0m"
 			sleep 1s
                 
         else
        		edmg=0
-                echo -e "\033[1;32mYour hero blocks an enemy attack\033[1;0m"
+                echo -e "\033[1;32m$name blocks an enemy attack\033[1;0m"
 		sleep 1s
 	fi
 
@@ -522,7 +541,7 @@ if [[ "$eblock" -lt 20 ]];
 	sleep 1s
 	if [[ $hdmg1 -gt 0 ]]
 	then
-		echo "Your hero deals $hdmg1 dmg and $hdmg2 dmg"
+		echo "$name deals $hdmg1 dmg and $hdmg2 dmg"
 		echo "Total $hdmg dmg"
 		sleep 1s
 	else	
@@ -530,12 +549,12 @@ if [[ "$eblock" -lt 20 ]];
 		then
 			hdmg=$(( $RANDOM % 5 + 1 ))
 		fi
-		echo "Your hero deals $hdmg dmg"
+		echo "$name deals $hdmg dmg"
 		sleep 1s
 	fi
 	if [[ $edmg1 -gt 0 ]]
 	then
-		echo "Enemy deals $edmg1 dmg and $edmg2 dmg"
+		echo "$enemy deals $edmg1 dmg and $edmg2 dmg"
 		echo "Total $edmg dmg"
 		sleep 1s
 	else
@@ -543,30 +562,44 @@ if [[ "$eblock" -lt 20 ]];
 		then
 			edmg=$(( $RANDOM % 5 + 1 ))
 		fi
-		echo "Enemy deals $edmg dmg"
+		echo "$enemy deals $edmg dmg"
 		sleep 1s
 	fi
 	hp=$(expr $hp - $edmg )
         ehp=$(expr $ehp - $hdmg )
 
-	echo "Your hero has $hp hp left"
-	echo "Enemy has $ehp hp left"
+	echo "$name has $hp hp left"
+	echo "$enemy has $ehp hp left"
 	echo ""
 	sleep 1s
 	let "round+=1"
 
-	if [[ "$hp" -lt 0 ]]
+	if [[ "$hp" -le 0 ]]
 	then
-		echo -e "\033[1;5;41mYou loose a battle!!!\033[1;0m"
+		echo -e "\033[1;5;41m$name loose a battle!!!Game Over!!!\033[1;0m"
 		let "loose+=1"
 		let "score-=3"
-		return 1
-	elif [[ "$ehp" -lt  0 ]]
+		ending
+	elif [[ "$ehp" -le  0 ]]
 	then
-		echo -e "\033[1;5;32mYou win a battle!!! Congratulations!!!\033[1;0m"
+		echo -e "\033[1;5;32m$name win a battle!!! Congratulations!!!\033[1;0m"
 		let "win+=1"
 		let "score+=3"
-		return 0
+		if [[ $boss -gt 0 ]]
+		then	
+			echo" "
+			reward
+			echo " "
+			reward
+			echo " "
+			boss=0
+		fi
+		echo " "
+		reward
+		echo " "
+		hstats
+		echo "SCORE:	$score"
+		cont
 	fi
 
 
@@ -575,9 +608,268 @@ done
 }
 battle
 }
+
+function reward ()
+{
+rew=$(( $RANDOM % 10 + 1 ))
+case "$rew" in
+	"1")
+	       	echo "$enemy dropps a healing potion"
+		sleep 1s
+		heal=$(( $RANDOM % $bhp + 1 ))
+		if [[ $heal -lt 25 ]]
+		then 
+			heal=25
+			echo "$name founds a small potion"
+			sleep 1s
+		elif [[ $heal -gt 50 ]]
+		then
+			heal=50
+                        echo "$name founds a big potion"
+			sleep 1s
+		else 
+			echo "$name founds a big potion"
+			sleep 1s
+		fi
+
+		hp=$(expr $hp + $heal )
+		if [[ $hp -ge $bhp ]]
+		then
+			hp=$bhp
+			echo "$name heals to MAX hp"
+			sleep 1s
+		else
+			echo "$name heals $heal hp"
+			sleep 1s
+		fi
+		;;
+	"2")
+		echo "$enemy drops a weapon"
+		sleep 1s
+		wep=$(( $RANDOM % 5 + 1 ))
+
+		case $wep in
+			"1")
+				echo "$name founds a cursed weapon"
+				bonus=$(expr  $(( $RANDOM % 5 + 1 )) - 3 )
+				batk=$(expr $batk + $bonus )
+
+					echo "$name atk changes to $batk"
+					sleep 1s
+					;;
+			"2") 
+				echo "$name founds a normal weapon"
+
+
+                                        let "batk+=1"
+					"$name atk changes to $batk"
+					sleep 1s
+                                        ;;
+			"3")    
+				echo "$name founds a good weapon"
+					
+					let "batk+=2"
+					echo "$name atk changes $batk"
+					sleep 1s
+					;;
+			"4")   
+				echo "$name founds a great weapon"
+
+					let "batk+=3"
+					echo "$name atk changes $batk"
+					sleep 1s
+					;;
+			"5")
+				echo "$name founds a blessed weapon"
+
+                                        let "batk+=5"
+					echo "$name atk changes $batk"
+					sleep 1s
+                                        ;;
+			esac
+		;;
+
+	"3")
+
+		echo "$enemy drops a shield"
+                sleep 1s
+                shd=$(( $RANDOM % 5 + 1 ))
+
+                case $shd in
+                        "1")
+                                echo "$name founds a cursed shield"
+                                bonus=$(expr  $(( $RANDOM % 5 + 1 )) -3 )
+                                bdef=$(expr $bdef + $bonus )
+                                        echo "$name def changes $bonus"
+					sleep 1s
+                                        ;;
+                        "2")
+                                echo "$name founds a normal shield"
+
+
+                                        let "bdef+=1"
+                                        
+					echo  "$name def changes to $bdef"
+					sleep 1s
+                                        ;;
+                        "3")
+                                echo "$name founds a good shield"
+
+                                        let "bdef+=2"
+                                        echo "$name def changes to $bdef"
+					sleep 1s
+                                        ;;
+                        "4")
+                                echo "$name founds a great shield"
+
+                                        let "bdef+=3"
+                                        
+					echo "$name def changes to $bdef"
+					sleep 1s
+                                        ;;
+                        "5")
+                                echo "$name founds a blessed shield"
+
+                                        let "bdef+=5"
+                                        echo "$name def changes to $bdef"
+					sleep 1s
+                                        ;;
+                        esac
+                ;;
+
+		"4")
+
+                echo "$enemy drops a shoes"
+                sleep 1s
+                bonus=$(( $RANDOM % 5 + 1 ))
+
+                case $bonus in
+                        "1")
+                                echo "$name founds a cursed shoes"
+                                bonus=$(expr  $(( $RANDOM % 5 + 1 )) -3 )
+                                bspeed=$(expr $bspeed + $bonus )
+                                        echo "$name speed changes $bonus"
+                                        ;;
+                        "2")
+                                echo "$name founds a normal shoes"
+
+
+                                        let "bspeed+=1"
+
+                                        echo  "$name speed changes to $bspeed"
+					sleep 1s
+                                        ;;
+                        "3")
+                                echo "$name founds a good shoes"
+
+                                        let "bspeed+=2"
+                                        echo "$name speed changes to $bspeed"
+					sleep 1s
+                                        ;;
+                        "4")
+                                echo "$name  founds a great shoes"
+
+                                        let "bspeed+=3"
+
+                                        echo "$name speed changes to $bspeed"
+					sleep 1s
+                                        ;;
+                        "5")
+                                echo "$name founds a blessed shield"
+
+                                        let "bspeed+=5"
+                                        echo "$name speed changes to $bspeed"
+					sleep 1s
+                                        ;;
+                        esac
+                ;;
+	"5")
+		echo "$enemy drops a small treasure(Score + 1)"
+		sleep 1s
+		let "score+=1"
+	;;
+
+
+	"6")
+		echo "$enemy drops a treasure(Score + 2)"
+		sleep 1s
+                let "score+=2"
+        ;;
+
+	"7")
+		echo "$enemy drops a big treasure(Score + 3)"
+		sleep 1s
+                let "score+=3"
+        ;;
+	"8")
+	 	echo "$enemy drops a golden key"
+		sleep 1s
+                let "key+=1"
+		;;
+	"9")
+		echo "$enemy drops a ring"
+                sleep 1s
+                bonus=$(( $RANDOM % 2 + 1 ))
+
+                case $bonus in
+                        "1")
+                                echo "$name founds a cursed ring"
+                                let "bcrit-=1"
+                                let "bblock-=1"
+                                bch=$(expr $bblock * 5 )
+                                cch=$(expr $bcrit * 5 )
+
+                                        echo "$name crit chance chnges to $(expr $cch + 5 )%" 
+                                        echo "$name block chance chnges to $(expr $bch + 5 )%"
+					sleep 1s
+                                        ;;
+                        
+                        "2")
+                                echo "$name founds a blessed ring"
+
+                                        let "bcrit+=1"
+                                        let "bblock+=1"
+                                        bch=$(expr $bblock * 5 )
+                                        cch=$(expr $bcrit * 5 )
+
+                                        echo "$name crit chance chnges to $(expr $cch + 5 )%" 
+                                        echo "$name block chance chnges to $(expr $bch + 5 )%"
+					sleep 1s
+                                        ;;
+			esac
+			;;
+	"10")
+		 echo "$enemy dropps healing potion"
+                heal=$(( $RANDOM % $bhp + 1 ))
+                if [[ $heal -lt 25 ]]
+                then
+                        heal=25
+                        echo "$name founds a small potion"
+                elif [[ $heal -gt 50 ]]
+                then
+                        heal=50
+                        echo "$name founds a big potion"
+                else
+                        echo "$name founds a normal potion"
+                fi
+
+                hp=$(expr $hp + $heal )
+                if [[ $hp -ge $bhp ]]
+                then
+                        hp=$bhp
+                        echo "$name heals to MAX hp"
+                else
+                        echo "$name heals $heal hp"
+                fi
+                ;;
+
+
+
+	esac
+	sleep 1s	
+}
 cont()
 {
-echo "Game will automatycally ends after 5 fights"
 echo "Do you want to fight with a next enemy? (yes/no)"
 text=0
 read -e text
@@ -587,11 +879,9 @@ case "$text" in
 	"yes")
 
         let "enemy+=1"
-        hero
    	mod 
 	walka
-        echo "The game will automatically end after five fights"
-        echo "Current fight nr $enemy"
+        echo "Current fight nr $fight"
         echo "Do you want to fight with a next enemy? (yes/no)"
         read -e text
 	validator
@@ -609,9 +899,9 @@ ending()
         echo "No Sword:$ns, No shield:$nsh"
         echo "Hard:$h, Medium:$m, Easy:$e"
         echo "score:$score"
-        echo "`date +%d.%m.%y` `date +%H:%M:%S` ${name//[[:space:]]/} $enemy $score" >> fight_score_board.log
+        echo "`date +%d.%m.%y` `date +%H:%M:%S` ${name//[[:space:]]/} $class $fight $score" >> fight_score_board.log
         echo -e "\033[1;5;32mTop 10 playes!!!\033[1;0m"
-        awk 'NR==1{print; next} {print | "sort -k 5nr"}' fight_score_board.log | head -n 11 | column -t
+        awk 'NR==1{print; next} {print | "sort -k 6nr"}' fight_score_board.log | head -n 11 | column -t
 
 	echo ""
 	echo "Do you want to play again?"
