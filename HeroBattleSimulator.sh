@@ -878,7 +878,7 @@ validator
 case "$text" in
 	"yes")
 
-        let "enemy+=1"
+        let "fight+=1"
    	mod 
 	walka
         echo "Current fight nr $fight"
