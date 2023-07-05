@@ -98,6 +98,14 @@ then
 fi
 
 }
+svalidator()
+{		
+                        while [ "$text" != "1" ] && [ "$text" != "2" ]
+			do
+			echo "Not the correct choice: type 1 or 2"
+                	read -e text
+			done
+}
 cvalidator()
 {
 	while [ "$text" != "1" ] && [ "$text" != "2" ] && [ "$text" != "3" ] && [ "$text" != "4" ]
@@ -106,10 +114,12 @@ cvalidator()
 		read -e text
 	done
 }
+
 function hero ()
 {
-	echo "Choose your class: (1:Warior, 2:Shadow, 3:Defender, 4:No class)"
-	read -e text
+
+echo "Choose your class: (1:Warior, 2:Shadow, 3:Defender, 4:No class)"
+read -e text
 cvalidator
 case "$text" in
 "1")
@@ -117,12 +127,13 @@ case "$text" in
 	atk=$(expr $(( RANDOM % 5 + 1 )) + 10 )
 	def=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
         hp=$(expr $(( $RANDOM % 25 + 1 )) + 100 )
-        block=$(( $RANDOM % 5 + 1))
+	block=$(( $RANDOM % 5 + 1))
         crit=$(( $RANDOM % 5 + 1 ))
-        speed=$(( $RANDOM % 5 + 1))
-	regen=$(expr $(( $RANDOM % 4 + 1 )) - 1 )
-
+        speed=$(( $RANDOM % 5 + 1 ))
+	regen=$(( $RANDOM % 2  + 1 ))	
 	;;
+     
+
 
 "2")
 	class="Shadow"
@@ -132,7 +143,7 @@ case "$text" in
         block=$(( $RANDOM % 5 + 1 ))
         crit=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
         speed=$(expr $(( $RANDOM % 5 + 1 )) + 10 )
-	regen=$(expr $(( $RANDOM % 3 + 1 )) + 2 )
+	regen=$(expr $(( $RANDOM % 2 + 1 ))
 	bpoi=$(( $RANDOM % 2 + 1 )) 
 	;;
 "3")
@@ -156,6 +167,7 @@ case "$text" in
 	;;
 
 esac
+
 
 echo ""
 critch=$(expr 5 * $crit )
@@ -182,6 +194,7 @@ bspeed=$speed
 hstats
 echo " "
 }
+
 function mod()
 {
 boss=0
