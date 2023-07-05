@@ -161,7 +161,7 @@ echo " "
 }
 function mod()
 {
-boss=1
+boss=0
 
 if [[ $key -gt 0 ]]
 then
@@ -192,8 +192,8 @@ sleep 1s
 enemy=$(shuf -n 1 boss.txt )
 eatk=$(expr $(( $RANDOM % 5 + 1 )) + 15 )
 edef=$(expr $(( $RANDOM % 5 + 1 )) + 15 )
-ehp=1
-#ehp=$(expr $(( RANDOM % 25 + 1 )) + 150 )
+#ehp=1
+ehp=$(expr $(( RANDOM % 25 + 1 )) + 150 )
 enblock=$(expr $(( RANDOM % 5 + 1 )) + 5 )
 encrit=$(expr $(( RANDOM % 5 + 1 )) + 5 )
 enspeed=$(( RANDOM % 10 + 1 ))
