@@ -79,6 +79,24 @@ fight=1
 win=0
 loose=0
 run=0
+#poison mechanic
+bpoi=1
+ebpoi=0
+poi=0
+epoi=0
+function poison ()
+{
+if [[ bpoi -gt 0 ]]
+then
+	let "poi+=$bpoi"
+fi
+}
+function epoison ()
+if [[ ebpoi -gt 0 ]]
+then
+        let "epoi+=$ebpoi"
+fi
+
 }
 cvalidator()
 {
@@ -102,6 +120,7 @@ case "$text" in
         block=$(( $RANDOM % 5 + 1))
         crit=$(( $RANDOM % 5 + 1 ))
         speed=$(( $RANDOM % 5 + 1))
+	regen=$(expr $(( $RANDOM % 4 + 1 )) - 1 )
 
 	;;
 
@@ -113,7 +132,8 @@ case "$text" in
         block=$(( $RANDOM % 5 + 1 ))
         crit=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
         speed=$(expr $(( $RANDOM % 5 + 1 )) + 10 )
-
+	regen=$(expr $(( $RANDOM % 3 + 1 )) + 2 )
+	bpoi=$(( $RANDOM % 2 + 1 )) 
 	;;
 "3")
 	class="Defender"
@@ -122,8 +142,8 @@ case "$text" in
         hp=$(expr $(( $RANDOM % 25 + 1 )) + 125 )
 	block=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
         crit=0
-        speed=$(( $RANDOM % 5 + 1))
-
+        speed=$(( $RANDOM % 5 + 1 ))
+	regen=$(expr $(( $RANDOM % 3 + 1 )) + 2 )
 	;;
 "4")
 	class="none"
@@ -149,6 +169,9 @@ echo "def:	$bdef"
 echo "crit:	$(expr $(expr $bcrit * 5 ) + 5 )%"
 echo "block:	$(expr $(expr $bblock * 5 ) + 5 )%"
 echo "speed:	$bspeed"
+echo "regen:	$regen%"
+echo "poison:	$bpoi"
+
 }
 bhp=$hp
 batk=$atk
@@ -197,6 +220,9 @@ ehp=$(expr $(( RANDOM % 25 + 1 )) + 150 )
 enblock=$(expr $(( RANDOM % 5 + 1 )) + 5 )
 encrit=$(expr $(( RANDOM % 5 + 1 )) + 5 )
 enspeed=$(( RANDOM % 10 + 1 ))
+mod=$(expr $fight / 10 )
+eregen=$mod
+ebpoi=$(( RANDOM % 3 + 1 ))
 let "score+=5"
 sleep 1s
 ;;
@@ -204,13 +230,29 @@ sleep 1s
 	"0")
 echo "An enemy appears"
 sleep 1s
+mod=$(expr $fight / 5 )
 enemy=$(shuf -n 1 enemy.txt )
-eatk=$(( $RANDOM % 15 + 1 ))
-edef=$(( $RANDOM % 15 + 1 ))
-ehp=$(( RANDOM % 50 + 1 ))
-enblock=$(( RANDOM % 5 + 1 ))
-encrit=$(( RANDOM % 5 + 1 ))
-enspeed=$(( $RANDOM % 15 + 1 ))
+eatk=$(expr $(( $RANDOM % 10 + 1 )) + $mod )
+edef=$(expr $(( $RANDOM % 10 + 1 )) + $mod )
+ehp=$(expr $(( RANDOM % 50 + 1 )) + $fight )
+mod=$(expr $fight / 10 )
+enblock=$(expr $(( RANDOM % 5 + 1 )) + $mod )
+encrit=$(expr $(( RANDOM % 5 + 1 )) + $mod )
+enspeed=$(expr $(( $RANDOM % 15 + 1 )) + $mod )
+eregen=$mod
+ebpoi=0
+if [[ mod -gt 10 ]]
+then
+ebpoi=$(expr $(( RANDOM % 3 + 1 )) - 2 )
+elif [[ mod -gt 20 ]]
+then
+      ebpoi=$(expr $(( RANDOM % 5 + 1 )) - 2 )
+fi
+if [[ bepoi -lt 0 ]]
+then 
+	ebpoi=0
+fi
+
 sleep 1s
 esac
 echo ""
@@ -221,6 +263,8 @@ echo "def:	$edef"
 echo "crit:	$(expr $(expr $encrit * 5 ) + 5 )%"
 echo "block:	$(expr $(expr $enblock * 5 ) + 5 )%"
 echo "speed:	$enspeed"
+echo "regen:	$eregen%"
+echo "poison:	$ebpoi"
 echo ""
 behp=$ehp
 beatk=$eatk
@@ -248,6 +292,7 @@ function run ()
                         sleep 1s
                         edmg=$(expr $(( $RANDOM % 15 + 1 )) + $eatk )
                         echo "$enemy deals $edmg dmg"
+			regen
                         hp=$(expr $hp - $edmg )
                         echo "Your hero has $hp hp left"
 
@@ -426,6 +471,8 @@ if [[ "$eblock" -lt 20 ]];
                 then
                 echo -e "\033[1;32m$name attacks an enemy twice\033[1;0m"
 		sleep 1s
+		poison
+		poison
                 hcrit1=$(expr $(( $RANDOM % 20 + 1 )) + $crit )
                 hcrit2=$(expr $(( $RANDOM % 20 + 1 )) + $crit )
                 declare -i hdmg1=$(expr $(( $RANDOM % 15 + 1 )) + $atk )
@@ -557,6 +604,7 @@ if [[ "$eblock" -lt 20 ]];
 			hdmg=$(( $RANDOM % 5 + 1 ))
 			fi
 		fi
+		poison
 		echo "$name deals $hdmg dmg"
 		sleep 1s
 	fi
@@ -576,16 +624,42 @@ if [[ "$eblock" -lt 20 ]];
 		echo "$enemy deals $edmg dmg"
 		sleep 1s
 	fi
+	function regen ()
+	{
 	if [[ $regen -gt 0 ]]
 	then
-		hp=$(expr $hp + $regen)
-		 echo "$name regen $regen hp"
+		sleep 1s
+		reg=$(expr $(expr $regen * $bhp ) / 100 )
+		hp=$(expr $hp + $reg ) 
+		 echo -e "\033[1;32m$name regen $reg hp\033[1;0m"
 		 if [[ $hp -ge $bhp ]]
 
 			then 
 				hp=$bhp
 		 fi
 	fi
+	if [[ $eregen -gt 0 ]]
+        then
+		sleep 1s
+                ereg=$(expr $(expr $eregen * $behp ) / 100 )
+                hp=$(expr $ehp + $ereg )
+                 echo -e "\033[1;31m$enemy regen $ereg hp\033[1;0m"
+                 if [[ $ehp -ge $behp ]]
+
+                        then
+                                ehp=$behp
+         	 fi
+        fi
+
+	}	
+	regen
+	if [[ $poi -gt 0 ]]
+	then
+	ehp=$(expr $ehp - $poi )
+
+	echo -e "\033[1;32m$enemy receives $poi poison dmg\033[1;0m"
+	fi
+
 	hp=$(expr $hp - $edmg )
         ehp=$(expr $ehp - $hdmg )
 
@@ -619,14 +693,16 @@ if [[ "$eblock" -lt 20 ]];
 		fi
 		
 		luck=$(( $RANDOM % 10 + 1))		
-
+		poi=0
 		echo " "
 		reward
 		echo " "
 		if [[ $luck -gt 5 ]]
                 then
-                        echo "$name has extra luck an found additional item"
+                        echo -e "\033[1;32m$name has an extra luck and founds an additional item\033[1;0m"
+			echo " "
                 reward
+			echo " "
                 fi
 
 		hstats
@@ -683,7 +759,7 @@ case "$rew" in
 		case $wep in
 			"1")
 				echo "$name founds a cursed weapon"
-				bonus=$(expr  $(( $RANDOM % 5 + 1 )) - 3 )
+				bonus=$(expr  $(( $RANDOM % 3 + 1 )) - 3 )
 				batk=$(expr $batk + $bonus )
 
 					echo "$name atk changes by $bonus"
@@ -730,7 +806,7 @@ case "$rew" in
                 case $shd in
                         "1")
                                 echo "$name founds a cursed shield"
-                                bonus=$(expr  $(( $RANDOM % 5 + 1 )) - 3 )
+                                bonus=$(expr  $(( $RANDOM % 3 + 1 )) - 3 )
                                 bdef=$(expr $bdef + $bonus )
                                         echo "$name def changes by $bonus"
 					sleep 1s
@@ -778,7 +854,7 @@ case "$rew" in
                 case $bonus in
                         "1")
                                 echo "$name founds a cursed shoes"
-                                bonus=$(expr  $(( $RANDOM % 5 + 1 )) - 3 )
+                                bonus=$(expr  $(( $RANDOM % 3 + 1 )) - 3 )
                                 bspeed=$(expr $bspeed + $bonus )
                                         echo "$name speed changes by $bonus"
                                         ;;
@@ -841,13 +917,15 @@ case "$rew" in
 	"9")
 		echo "$enemy drops a ring"
                 sleep 1s
-                bonus=$(( $RANDOM % 5 + 1 ))
+                bonus=$(( $RANDOM % 6 + 1 ))
 
                 case $bonus in
                         "1")
-                                echo "$name founds a cursed ring"
-                                let "bcrit-=1"
-                                let "bblock-=1"
+                                echo "$name founds a ring of fool"
+				bonus=$(expr $(( RANDOM % 2 + 1 )) - 3  )
+                                let "bcrit+=$bonus"
+				bonus=$(expr $(( RANDOM % 2 + 1 )) - 3  )
+                                let "bblock+=$bonus"
                                 bch=$(expr $bblock * 5 )
                                 cch=$(expr $bcrit * 5 )
 
@@ -857,10 +935,11 @@ case "$rew" in
                                         ;;
                         
                         "2")
-                                echo "$name founds a blessed ring"
-
-                                        let "bcrit+=1"
-                                        let "bblock+=1"
+                                echo "$name founds a ring of skills"
+					bonus=$(( RANDOM % 2 + 1 ))
+                                        let "bcrit+=$bonus"
+					bonus=$(( RANDOM % 2 + 1 ))
+                                        let "bblock+=$bonus"
                                         bch=$(expr $bblock * 5 )
                                         cch=$(expr $bcrit * 5 )
 
@@ -872,11 +951,12 @@ case "$rew" in
 				echo "$name founds a ring of regeneration"
 				if [[ $regen -le 0 ]]
 				then
-					regen=$(expr $bhp / 10 )
-					echo "$name is able to regenerate $regen hp on every turn"
+					let "regen+=5"
+					echo "$name regenerates $regen% hp on every turn from now"
 				else
-					regen=$(expr $(expr $bhp / 10 ) + $regen )
-					echo "$name is able to regenerate $regen hp on every turn"
+					bonus=$(expr $(( RANDOM % 5 + 1 )) + 2 )
+					let "regen+=$bonus"
+					echo "$name raises his regeneration to $regen% hp on every turn"
 
 
 				fi
@@ -904,7 +984,14 @@ case "$rew" in
 					bspeed=$(expr $(( RANDOM % $bspeed )) + 2 )
 
 				;;
+			"6")
 
+                                        echo "$name founds a ring of the Venomous Viper"
+					bonus=$(( RANDOM % 2 + 1 ))
+					let "bpoi+=$bonus"
+
+					echo "$name deals $bpoi poison dmg from now"
+					
 
 				esac
 			;;
