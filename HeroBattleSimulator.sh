@@ -62,8 +62,8 @@ sleep 2
 "no")
 	echo ""
 esac
+regen=0
 key=0
-boss=0
 h=0
 m=0
 e=0
@@ -97,7 +97,7 @@ case "$text" in
 "1")
 	class="Warior"
 	atk=$(expr $(( RANDOM % 5 + 1 )) + 10 )
-	def=$(( $RANDOM % 5 + 1 ))
+	def=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
         hp=$(expr $(( $RANDOM % 25 + 1 )) + 100 )
         block=$(( $RANDOM % 5 + 1))
         crit=$(( $RANDOM % 5 + 1 ))
@@ -108,7 +108,7 @@ case "$text" in
 "2")
 	class="Shadow"
 	atk=$(( RANDOM % 5 + 1 ))
-	def=$(( $RANDOM % 5 + 1 ))
+	def=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
         hp=$(expr $(( $RANDOM % 25 + 1 )) + 75 )
         block=$(( $RANDOM % 5 + 1 ))
         crit=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
@@ -118,7 +118,7 @@ case "$text" in
 "3")
 	class="Defender"
 	atk=$(( RANDOM % 5 + 1 ))
-	def=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
+	def=$(expr $(( $RANDOM % 5 + 1 )) + 10 )
         hp=$(expr $(( $RANDOM % 25 + 1 )) + 125 )
 	block=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
         crit=0
@@ -128,7 +128,7 @@ case "$text" in
 "4")
 	class="none"
 	atk=$(expr $(( RANDOM % 5 )) + 5 )
-	def=$(( $RANDOM % 5 ))
+	def=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
 	hp=$(expr $(( $RANDOM % 25 )) + 100 )
 	block=$(( $RANDOM % 5 ))
 	crit=$(( $RANDOM % 5 ))
@@ -146,8 +146,8 @@ echo "Your hero stats"
 echo "hp:	$hp"
 echo "atk:	$batk"
 echo "def:	$bdef"
-echo "crit:	+$(expr $bcrit * 5 )%"
-echo "block:	+$(expr $bblock * 5 )%"
+echo "crit:	$(expr $(expr $bcrit * 5 ) + 5 )%"
+echo "block:	$(expr $(expr $bblock * 5 ) + 5 )%"
 echo "speed:	$bspeed"
 }
 bhp=$hp
@@ -161,7 +161,8 @@ echo " "
 }
 function mod()
 {
-	
+boss=1
+
 if [[ $key -gt 0 ]]
 then
 echo "$name has a golden key"
@@ -190,8 +191,9 @@ echo -e "The BOSS Appears"
 sleep 1s
 enemy=$(shuf -n 1 boss.txt )
 eatk=$(expr $(( $RANDOM % 5 + 1 )) + 15 )
-edef=$(expr $(( $RANDOM % 5 + 1 )) + 10 )
-ehp=$(expr $(( RANDOM % 25 + 1 )) + 150 )
+edef=$(expr $(( $RANDOM % 5 + 1 )) + 15 )
+ehp=1
+#ehp=$(expr $(( RANDOM % 25 + 1 )) + 150 )
 enblock=$(expr $(( RANDOM % 5 + 1 )) + 5 )
 encrit=$(expr $(( RANDOM % 5 + 1 )) + 5 )
 enspeed=$(( RANDOM % 10 + 1 ))
@@ -204,8 +206,8 @@ echo "An enemy appears"
 sleep 1s
 enemy=$(shuf -n 1 enemy.txt )
 eatk=$(( $RANDOM % 15 + 1 ))
-edef=$(( $RANDOM % 10 + 1 ))
-ehp=$(( RANDOM % 100 + 1 ))
+edef=$(( $RANDOM % 15 + 1 ))
+ehp=$(( RANDOM % 50 + 1 ))
 enblock=$(( RANDOM % 5 + 1 ))
 encrit=$(( RANDOM % 5 + 1 ))
 enspeed=$(( $RANDOM % 15 + 1 ))
@@ -216,8 +218,8 @@ echo "$enemy"
 echo "hp:	$ehp"
 echo "atk:	$eatk"
 echo "def:	$edef"
-echo "crit:	+$(expr $encrit * 5 )%"
-echo "block:	+$(expr $enblock * 5 )%"
+echo "crit:	$(expr $(expr $encrit * 5 ) + 5 )%"
+echo "block:	$(expr $(expr $enblock * 5 ) + 5 )%"
 echo "speed:	$enspeed"
 echo ""
 behp=$ehp
@@ -345,7 +347,9 @@ while [ "$hp" > 0 ]
 do 
 	echo "round $round"
 	#stats reset
-        atk=$batk
+        hb=0
+	eb=0
+	atk=$batk
         def=$bdef
         crit=$bcrit
         block=$bblock
@@ -404,17 +408,17 @@ Efightoption
 	if [[ $def -gt 0 ]]
 
 	then
-	    	def=$(( $RANDOM % $def + 1 ))
-		eatk=$(expr $eatk - $def )
+		ndef=$(expr $def / 2 )
+		eatk=$(expr $eatk - $ndef )
 	fi
 	if [[ $edef -gt 0 ]] 
 	then	
-		edef=$(( $RANDOM % $edefa + 1 ))
-		atk=$(expr $atk - $edef )
+		nedef=$(expr $edef / 2 )
+		atk=$(expr $atk - $nedef )
 	fi
 
-	declare -i hdmg=$(expr $(( $RANDOM % 15 + 1 )) + $atk ) 
-	declare -i edmg=$(expr $(( $RANDOM % 15 + 1 )) + $eatk ) 
+	hdmg=$(expr $(( $RANDOM % 15 + 1 )) + $atk ) 
+	edmg=$(expr $(( $RANDOM % 15 + 1 )) + $eatk ) 
 	echo ""
 if [[ "$eblock" -lt 20 ]];
         then
@@ -470,6 +474,7 @@ if [[ "$eblock" -lt 20 ]];
 			sleep 1s
 		fi
         else
+		eb=1
              hdmg=0
                 echo -e "\033[1;31m$enemy blocks your attack\033[1;0m"
 		sleep 1s
@@ -530,7 +535,8 @@ if [[ "$eblock" -lt 20 ]];
                         echo -e "\033[1;31m$enemy lands the critcal attack\033[1;0m"
 			sleep 1s
                 
-        else
+        else	
+		hb=1
        		edmg=0
                 echo -e "\033[1;32m$name blocks an enemy attack\033[1;0m"
 		sleep 1s
@@ -544,9 +550,12 @@ if [[ "$eblock" -lt 20 ]];
 		echo "Total $hdmg dmg"
 		sleep 1s
 	else	
-		if [[ $hdmg -lt 0 ]]
+		if [[ $hdmg -le 0 ]]
 		then
+			if [[ $eb -le 0 ]]
+			then
 			hdmg=$(( $RANDOM % 5 + 1 ))
+			fi
 		fi
 		echo "$name deals $hdmg dmg"
 		sleep 1s
@@ -557,12 +566,25 @@ if [[ "$eblock" -lt 20 ]];
 		echo "Total $edmg dmg"
 		sleep 1s
 	else
-		if [[ $edmg -lt 0 ]]
+		if [[ $edmg -le 0 ]]
 		then
+			if [[ $hb -le 0 ]]
+			then
 			edmg=$(( $RANDOM % 5 + 1 ))
+			fi
 		fi
 		echo "$enemy deals $edmg dmg"
 		sleep 1s
+	fi
+	if [[ $regen -gt 0 ]]
+	then
+		hp=$(expr $hp + $regen)
+		 echo "$name regen $regen hp"
+		 if [[ $hp -ge $bhp ]]
+
+			then 
+				hp=$bhp
+		 fi
 	fi
 	hp=$(expr $hp - $edmg )
         ehp=$(expr $ehp - $hdmg )
@@ -588,18 +610,25 @@ if [[ "$eblock" -lt 20 ]];
 		then	
 			echo " "
 			reward
-			echo" "
+			echo " "
 			reward
 			echo " "
 			reward
 			echo " "
 			boss=0
 		fi
+		
+		luck=$(( $RANDOM % 10 + 1))		
+
 		echo " "
 		reward
 		echo " "
-		reward
-		echo " "
+		if [[ $luck -gt 5 ]]
+                then
+                        echo "$name has extra luck an found additional item"
+                reward
+                fi
+
 		hstats
 		echo "SCORE:	$score"
 		cont
@@ -657,7 +686,7 @@ case "$rew" in
 				bonus=$(expr  $(( $RANDOM % 5 + 1 )) - 3 )
 				batk=$(expr $batk + $bonus )
 
-					echo "$name atk changes to $batk"
+					echo "$name atk changes by $bonus"
 					sleep 1s
 					;;
 			"2") 
@@ -665,28 +694,28 @@ case "$rew" in
 
 
                                         let "batk+=1"
-					"$name atk changes to $batk"
+				echo "$name atk changes to $batk"
 					sleep 1s
                                         ;;
 			"3")    
 				echo "$name founds a good weapon"
 					
 					let "batk+=2"
-					echo "$name atk changes $batk"
+					echo "$name atk changes to $batk"
 					sleep 1s
 					;;
 			"4")   
 				echo "$name founds a great weapon"
 
 					let "batk+=3"
-					echo "$name atk changes $batk"
+					echo "$name atk changes to $batk"
 					sleep 1s
 					;;
 			"5")
 				echo "$name founds a blessed weapon"
 
                                         let "batk+=5"
-					echo "$name atk changes $batk"
+					echo "$name atk changes to $batk"
 					sleep 1s
                                         ;;
 			esac
@@ -701,9 +730,9 @@ case "$rew" in
                 case $shd in
                         "1")
                                 echo "$name founds a cursed shield"
-                                bonus=$(expr  $(( $RANDOM % 5 + 1 )) -3 )
+                                bonus=$(expr  $(( $RANDOM % 5 + 1 )) - 3 )
                                 bdef=$(expr $bdef + $bonus )
-                                        echo "$name def changes $bonus"
+                                        echo "$name def changes by $bonus"
 					sleep 1s
                                         ;;
                         "2")
@@ -749,9 +778,9 @@ case "$rew" in
                 case $bonus in
                         "1")
                                 echo "$name founds a cursed shoes"
-                                bonus=$(expr  $(( $RANDOM % 5 + 1 )) -3 )
+                                bonus=$(expr  $(( $RANDOM % 5 + 1 )) - 3 )
                                 bspeed=$(expr $bspeed + $bonus )
-                                        echo "$name speed changes $bonus"
+                                        echo "$name speed changes by $bonus"
                                         ;;
                         "2")
                                 echo "$name founds a normal shoes"
@@ -778,7 +807,7 @@ case "$rew" in
 					sleep 1s
                                         ;;
                         "5")
-                                echo "$name founds a blessed shield"
+                                echo "$name founds a blessed shoes"
 
                                         let "bspeed+=5"
                                         echo "$name speed changes to $bspeed"
@@ -812,7 +841,7 @@ case "$rew" in
 	"9")
 		echo "$enemy drops a ring"
                 sleep 1s
-                bonus=$(( $RANDOM % 2 + 1 ))
+                bonus=$(( $RANDOM % 5 + 1 ))
 
                 case $bonus in
                         "1")
@@ -839,7 +868,45 @@ case "$rew" in
                                         echo "$name block chance chnges to $(expr $bch + 5 )%"
 					sleep 1s
                                         ;;
-			esac
+			"3")
+				echo "$name founds a ring of regeneration"
+				if [[ $regen -le 0 ]]
+				then
+					regen=$(expr $bhp / 10 )
+					echo "$name is able to regenerate $regen hp on every turn"
+				else
+					regen=$(expr $(expr $bhp / 10 ) + $regen )
+					echo "$name is able to regenerate $regen hp on every turn"
+
+
+				fi
+				sleep 1s
+				;;
+
+			"4")	
+				echo "$name founds a ring of the Giagant"
+
+				bhp=$(expr $bhp + 25 )
+				hp=$(expr $hp + 25 )
+				echo "$name raises his hp pernamently by 25"
+				;;
+
+			"5")	
+				
+					echo "$name founds a ring of the Trickster"
+					sleep 1s
+					echo "$name stats has been shufled"
+					sleep 1s
+					bdef=$(expr $(( RANDOM % $bdef )) + 2 )
+					batt=$(expr $(( RANDOM % $batk )) + 2 )
+					bcrit=$(expr $(( RANDOM % $bcrit )) + 2 )
+					bblock=$(expr $(( RANDOM % $bclock )) + 2 )
+					bspeed=$(expr $(( RANDOM % $bspeed )) + 2 )
+
+				;;
+
+
+				esac
 			;;
 	"10")
 		 echo "$enemy dropps healing potion"
