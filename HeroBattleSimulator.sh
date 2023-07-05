@@ -222,6 +222,10 @@ case $class in
 	"Barbarian")
 echo "Frezny:	$frenzy%"
 ;;
+	"Vampire")
+echo "Lifesteal:   $lfsteel%"
+;;
+
 esac
 
 }
@@ -757,6 +761,12 @@ function barb ()
 		then
                 hp=$(expr $hp + $lfback )
                 echo "$name steals $lfback hp"
+		if [[ $hp -ge $bhp ]]
+
+                        then
+                                hp=$bhp
+                fi
+
 		sleep 1s
                 fi
         fi
