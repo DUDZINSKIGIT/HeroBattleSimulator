@@ -80,7 +80,7 @@ win=0
 loose=0
 run=0
 #poison mechanic
-bpoi=1
+bpoi=0
 ebpoi=0
 poi=0
 epoi=0
@@ -126,13 +126,48 @@ case "$text" in
 	class="Warior"
 	atk=$(expr $(( RANDOM % 5 + 1 )) + 10 )
 	def=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
-        hp=$(expr $(( $RANDOM % 25 + 1 )) + 100 )
+    	hp=$(expr $(( $RANDOM % 25 + 1 )) + 100 )
 	block=$(( $RANDOM % 5 + 1))
-        crit=$(( $RANDOM % 5 + 1 ))
-        speed=$(( $RANDOM % 5 + 1 ))
+    	crit=$(( $RANDOM % 5 + 1 ))
+    	speed=$(( $RANDOM % 5 + 1 ))
 	regen=$(( $RANDOM % 2  + 1 ))	
-	;;
-     
+	echo "Do you want to choose sub-class? Type: yes/no"
+	read -e text
+	validator
+				case $text in
+						
+						"yes")
+							echo "Which sub-class you want to choose: 1.Barbarian, 2.Vampire? Type 1 or 2"
+							read -e text
+							svalidator
+								case $text in
+								"1")
+								class="Barbarian"
+								atk=$(expr $(( RANDOM % 5 + 1 )) + 15 )
+								def=$(( $RANDOM % 5 + 1 ))
+    								hp=$(expr $(( $RANDOM % 25 + 1 )) + 125 )
+								block=0
+    								crit=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
+    								speed=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
+								regen=$(( $RANDOM % 2  + 1 ))
+								frenzy=20
+								;;
+								"2") 
+								class="Vampire"
+								atk=$(expr $(( RANDOM % 5 + 1 )) + 10 )
+								def=$(( $RANDOM % 5 + 1 ))
+    								hp=$(expr $(( $RANDOM % 25 + 1 )) + 75 )
+								block=$(( $RANDOM % 5 + 1))
+    								crit=0
+    								speed=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
+								regen=$(( $RANDOM % 2  + 1 ))
+								lfsteel=20
+								;;
+								esac
+						;;			
+				
+				esac
+;;
 
 
 "2")
@@ -183,6 +218,11 @@ echo "block:	$(expr $(expr $bblock * 5 ) + 5 )%"
 echo "speed:	$bspeed"
 echo "regen:	$regen%"
 echo "poison:	$bpoi"
+case $class in 
+	"Barbarian")
+echo "Frezny:	$frenzy%"
+;;
+esac
 
 }
 bhp=$hp
@@ -546,6 +586,8 @@ if [[ "$eblock" -lt 20 ]];
 			then
 			echo -e "\033[1;31m$enemy attacks your hero twice\033[1;0m"
 			sleep 1s
+			epoison
+			epoison
 			ecrit1=$(expr $(( $RANDOM % 20 + 1 )) + $encrit )
 			ecrit2=$(expr $(( $RANDOM % 20 + 1 )) + $encrit )
 			declare -i edmg1=$(expr $(( $RANDOM % 15 + 1 )) + $eatk )
@@ -590,7 +632,7 @@ if [[ "$eblock" -lt 20 ]];
 			then
 				edmg=10
 			fi
-					
+			epoison		
 			let edmg=$(expr $edmg * 2 )
                         echo -e "\033[1;31m$enemy lands the critcal attack\033[1;0m"
 			sleep 1s
@@ -602,7 +644,8 @@ if [[ "$eblock" -lt 20 ]];
 		sleep 1s
 	fi
 
-	
+	dmgcalc ()
+	{	
 	sleep 1s
 	if [[ $hdmg1 -gt 0 ]]
 	then
@@ -634,9 +677,11 @@ if [[ "$eblock" -lt 20 ]];
 			edmg=$(( $RANDOM % 5 + 1 ))
 			fi
 		fi
+		epoison
 		echo "$enemy deals $edmg dmg"
 		sleep 1s
 	fi
+
 	function regen ()
 	{
 	if [[ $regen -gt 0 ]]
@@ -645,34 +690,79 @@ if [[ "$eblock" -lt 20 ]];
 		reg=$(expr $(expr $regen * $bhp ) / 100 )
 		hp=$(expr $hp + $reg ) 
 		 echo -e "\033[1;32m$name regen $reg hp\033[1;0m"
+		 sleep 1s
 		 if [[ $hp -ge $bhp ]]
 
 			then 
 				hp=$bhp
 		 fi
 	fi
+	
 	if [[ $eregen -gt 0 ]]
         then
 		sleep 1s
                 ereg=$(expr $(expr $eregen * $behp ) / 100 )
                 hp=$(expr $ehp + $ereg )
                  echo -e "\033[1;31m$enemy regen $ereg hp\033[1;0m"
+		 sleep 1s
                  if [[ $ehp -ge $behp ]]
 
                         then
                                 ehp=$behp
          	 fi
         fi
-
 	}	
-	regen
+	
+		
+function poisondmg ()
+	{	
 	if [[ $poi -gt 0 ]]
 	then
 	ehp=$(expr $ehp - $poi )
-
+	
 	echo -e "\033[1;32m$enemy receives $poi poison dmg\033[1;0m"
+	let "poi-=1"
+	sleep 1s
 	fi
+	if [[ $epoi -gt 0 ]]
+		then
+        hp=$(expr $hp - $epoi )
 
+        echo -e "\033[1;31m$name receives $epoi poison dmg\033[1;0m"
+	let "epoi-=1"
+	sleep 1s
+
+        fi
+
+	}
+	regen
+	poisondmg
+	
+function barb ()
+
+	{
+	if [[ $frenzy -gt 0 ]]
+	then
+		fredmg=$(expr $(expr $frenzy * $hdmg ) / 100 )
+		if [[ $fredmg -gt 0 ]]	
+		then
+		hp=$(expr $hp - $fredmg )
+		echo "$name deals $fredmg to yourself in frenzy"
+		fi
+	fi
+	if [[ $lfsteel -gt 0 ]]
+        then
+                lfback=$(expr $(expr $lfsteel * $hdmg ) / 100 )
+                if [[ $lfsteel -gt 0 ]]
+		then
+                hp=$(expr $hp + $lfback )
+                echo "$name steals $lfback hp"
+		sleep 1s
+                fi
+        fi
+
+	}
+	barb
 	hp=$(expr $hp - $edmg )
         ehp=$(expr $ehp - $hdmg )
 
@@ -681,7 +771,9 @@ if [[ "$eblock" -lt 20 ]];
 	echo ""
 	sleep 1s
 	let "round+=1"
+}
 
+dmgcalc
 	if [[ "$hp" -le 0 ]]
 	then
 		echo -e "\033[1;5;41m$name loose a battle!!!Game Over!!!\033[1;0m"
