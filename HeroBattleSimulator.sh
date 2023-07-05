@@ -420,167 +420,131 @@ Efightoption
 	hdmg=$(expr $(( $RANDOM % 15 + 1 )) + $atk ) 
 	edmg=$(expr $(( $RANDOM % 15 + 1 )) + $eatk ) 
 	echo ""
-case "$eblock" in 
-<20->)
-      eb=1
-      hdmg=0
-      echo -e "\033[1;31m$enemy blocks your attack\033[1;0m"
-      dmgcalc
-;;
-<-20>)
-      case "$hspeed" in
-      <$(expr $espeed * 2 )->)
+if [[ "$eblock" -lt 20 ]];
+        then
+		if [[ "$hspeed" -ge $(expr $espeed * 2 ) ]]
+                then
                 echo -e "\033[1;32m$name attacks an enemy twice\033[1;0m"
-                sleep 1s
+		sleep 1s
                 hcrit1=$(expr $(( $RANDOM % 20 + 1 )) + $crit )
                 hcrit2=$(expr $(( $RANDOM % 20 + 1 )) + $crit )
                 declare -i hdmg1=$(expr $(( $RANDOM % 15 + 1 )) + $atk )
                 declare -i hdmg2=$(expr $(( $RANDOM % 15 + 1 )) + $atk )
-                
-                if [[ $hdmg1 -le 0 ]]
-                then
-                hdmg1=$(( $RANDOM % 5 + 1 ))
-                fi
-                
-                if [[ $hdmg2 -le 0 ]]
-                then
-                hdmg2=$(( $RANDOM % 5 + 1 ))
-                fi
-                
-                if [[ "$hcrit1" -ge 20 ]]
-                then
-                echo -e "\033[1;32m$name 1st attack is a crit\033[1;0m"
-                sleep 1s
-		              
-                	if [[ "hdmg1" -lt 10 ]]
+				if [[ $hdmg1 -le 0 ]]
+                                        then
+                                        hdmg1=$(( $RANDOM % 5 + 1 ))
+                                fi
+                                if [[ $hdmg2 -le 0 ]]
+                                        then
+                                        hdmg2=$(( $RANDOM % 5 + 1 ))
+                                fi
+
+                        if [[ "$hcrit1" -ge 20 ]]
+                        then
+                        echo -e "\033[1;32m$name 1st attack is a crit\033[1;0m"
+                        sleep 1s
+			if [[ "hdmg1" -lt 10 ]]
 			then
-			hdmg1=10
+				hdmg1=10
 			fi
-                                
-		hdmg1=$(expr $hdmg1 * 2 )
-                fi
-                
-                if [[ "$hcrit2" -ge 20 ]]
-                then
-                echo -e "\033[1;32m$name 2nd attack is a crit\033[1;0m"
-                sleep 1s
-			            
-                  if [[ "hdmg2" -lt 10 ]]
-                  then
-                  hdmg2=10
-                  fi
+			hdmg1=$(expr $hdmg1 * 2 )
+                        fi
+                        if [[ "$hcrit2" -ge 20 ]]
+                        then
+                        echo -e "\033[1;32m$name 2nd attack is a crit\033[1;0m"
+                        sleep 1s
+			if [[ "hdmg2" -lt 10 ]]
+                        then
+                                hdmg2=10
+                        fi
 
-		hdmg2=$(expr $hdmg2 * 2 )
-                fi
-                
-                hdmg=$(expr $hdmg1 + $hdmg2 )
-                dmgcalc
-             ;;
-          esac 
-          
-        if [[ "$hcrit" -ge 20 ]]
-        then
-                 
-		if [[ "$hdmg" -lt 10 ]]
-		then
-		hdmg=10
+			hdmg2=$(expr $hdmg2 * 2 )
+                        fi
+                        hdmg=$(expr $hdmg1 + $hdmg2 )
+
+                elif [[ "$hcrit" -ge 20 ]]
+                then 
+			if [[ "$hdmg" -lt 10 ]]
+			then
+				hdmg=10
+			fi
+
+			let hdmg=$(expr $hdmg * 2 )
+                        echo -e "\033[1;32m$name lands the critcal attack\033[1;0m"
+			sleep 1s
 		fi
-
-	let hdmg=$(expr $hdmg * 2 )
-        echo -e "\033[1;32m$name lands the critcal attack\033[1;0m"
-	sleep 1s
-        dmgcalc
-	fi
-            
-      ;;
-esac
-
-  case "$hblock" in
-  <20->)
-        hb=1
-       	edmg=0
-        echo -e "\033[1;32m$name blocks an enemy attack\033[1;0m"
-	sleep 1s
-        dmgcalc
-        ;;
-  <-20>)
-      case "$espeed" in
-      <$(expr $hspeed * 2 )->)
-              
-
+        else
+		eb=1
+             hdmg=0
+                echo -e "\033[1;31m$enemy blocks your attack\033[1;0m"
+		sleep 1s
+        fi
+	if [[ "$hblock" -lt 20 ]];
+        	then
+			
+		if [[ "$espeed" -ge $(expr $hspeed * 2 ) ]]
+			then
 			echo -e "\033[1;31m$enemy attacks your hero twice\033[1;0m"
 			sleep 1s
 			ecrit1=$(expr $(( $RANDOM % 20 + 1 )) + $encrit )
 			ecrit2=$(expr $(( $RANDOM % 20 + 1 )) + $encrit )
 			declare -i edmg1=$(expr $(( $RANDOM % 15 + 1 )) + $eatk )
 			declare -i edmg2=$(expr $(( $RANDOM % 15 + 1  )) + $eatk )
-				
-        if [[ $edmg1 -le 0 ]]
-				then
-				edmg1=$(( $RANDOM % 5 + 1 ))	
+				if [[ $edmg1 -le 0 ]]
+					then
+					edmg1=$(( $RANDOM % 5 + 1 ))	
 				fi
-				
-        if [[ $edmg2 -le 0 ]]
-				then
-        			edmg2=$(( $RANDOM % 5 + 1 ))
+				if [[ $edmg2 -le 0 ]]
+					then
+                                        edmg2=$(( $RANDOM % 5 + 1 ))
 				fi
 			
-					if [[ "$ecrit1" -ge 20 ]]
-        				then
-					echo -e "\033[1;31m$enemy 1st attack is a crit\033[1;0m"
-					sleep 1s
-				  
-          					if [[ "$edmg1" -lt 10 ]]
-  		    				then
-    		  				edmg1=10  
- 	 	      				fi
+				if [[ "$ecrit1" -ge 20 ]]
 
-					edmg1=$(expr $edmg1 * 2 )
-					fi
-				
-   					if [[ "$ecrit2" -ge 20 ]]
-					then
-					echo  -e "\033[1;31m$enemy 2nd attack is a crit\033[1;0m"
- 			  		sleep 1s
-				
-         					if [[ "$edmg2" -lt 10 ]]
-          					then
-        				 	edmg2=10
-       	  					fi
+				then
+				echo -e "\033[1;31m$enemy 1st attack is a crit\033[1;0m"
+				sleep 1s
+					if [[ "$edmg1" -lt 10 ]]
+                              		then
+                              		edmg1=10
+                             	 	fi
 
-        					edmg2=$(expr $edmg2 * 2 )
-						fi
-        
-				edmg=$(expr $edmg1 + $edmg2 )
-      				dgmcalc
+				edmg1=$(expr $edmg1 * 2 )
 				fi
-      
-      ;;
-      esac
-      
-      
-	if [[ "$ecrit" -ge 20 ]]
-                then
-			  
-        	if [[ "$edmg" -lt 10 ]]
-		then
-		edmg=10
-        fi 
-		  
-      
+				if [[ "$ecrit2" -ge 20 ]]
+				then
+					echo  -e "\033[1;31m$enemy 2nd attack is a crit\033[1;0m"
+                			sleep 1s
+					if [[ "$edmg2" -lt 10 ]]
+                                	then
+                                        	edmg2=10
+                                	fi
+
+					edmg2=$(expr $edmg2 * 2 )
+				fi
+			edmg=$(expr $edmg1 + $edmg2 )
+			fi
+		elif [[ "$ecrit" -ge 20 ]]
+                	then
+			if [[ "$edmg" -lt 10 ]]
+			then
+				edmg=10
+			fi
 					
-	let edmg=$(expr $edmg * 2 )
-      	echo -e "\033[1;31m$enemy lands the critcal attack\033[1;0m"
-	sleep 1s
-      	dmgcalc
-      	fi
+			let edmg=$(expr $edmg * 2 )
+                        echo -e "\033[1;31m$enemy lands the critcal attack\033[1;0m"
+			sleep 1s
                 
-   esac
+        else	
+		hb=1
+       		edmg=0
+                echo -e "\033[1;32m$name blocks an enemy attack\033[1;0m"
+		sleep 1s
+	fi
+
 	
 	sleep 1s
-function dmgcalc()
-{
-if [[ $hdmg1 -gt 0 ]]
+	if [[ $hdmg1 -gt 0 ]]
 	then
 		echo "$name deals $hdmg1 dmg and $hdmg2 dmg"
 		echo "Total $hdmg dmg"
@@ -614,8 +578,7 @@ if [[ $hdmg1 -gt 0 ]]
 	fi
 	if [[ $regen -gt 0 ]]
 	then
- 	reg=$(expr $(expr $regen * $bhp ) / 100 )
-		hp=$(expr $hp + $reg)
+		hp=$(expr $hp + $regen)
 		 echo "$name regen $regen hp"
 		 if [[ $hp -ge $bhp ]]
 
@@ -674,8 +637,6 @@ if [[ $hdmg1 -gt 0 ]]
 
 
 done
-}
-dmgcalc
 }
 battle
 }
@@ -910,12 +871,11 @@ case "$rew" in
 			"3")
 				echo "$name founds a ring of regeneration"
 				if [[ $regen -le 0 ]]
-				then    
-					let "regen+=5"
-					echo "$name is able to regenerate $regen% hp on every turn"
+				then
+					regen=$(expr $bhp / 10 )
+					echo "$name is able to regenerate $regen hp on every turn"
 				else
-    					bonus=$(expr $(( RANDOM % 5 + 1 ) + 2 )
-					let "regen+=$bonus"
+					regen=$(expr $(expr $bhp / 10 ) + $regen )
 					echo "$name is able to regenerate $regen hp on every turn"
 
 
