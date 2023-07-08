@@ -62,6 +62,201 @@ sleep 2
 "no")
 	echo ""
 esac
+
+function summary ()
+{
+	if [[ "$hp" -le 0 ]]
+	then
+		echo -e "\033[1;5;41m$name loose a battle!!!Game Over!!!\033[1;0m"
+		let "loose+=1"
+		let "score-=3"
+		ending
+	elif [[ "$ehp" -le  0 ]]
+	then
+		echo -e "\033[1;5;32m$name win a battle!!! Congratulations!!!\033[1;0m"
+		let "win+=1"
+		let "score+=3"
+		if [[ $boss -gt 0 ]]
+		then	
+			echo " "
+			reward
+			echo " "
+			reward
+			echo " "
+			reward
+			echo " "
+			boss=0
+		fi
+		
+		luck=$(( $RANDOM % 10 + 1))		
+		poi=0
+		echo " "
+		reward
+		echo " "
+		if [[ $luck -gt 5 ]]
+                then
+                        echo -e "\033[1;32m$name has an extra luck and founds an additional item\033[1;0m"
+			echo " "
+                reward
+			echo " "
+                fi
+		if [[ $class == "Ranger" ]]
+		then
+			dist=2
+		fi
+		hstats
+		echo "SCORE:	$score"
+		cont
+	fi
+}
+
+function dmgcalc ()
+
+{	
+	sleep 1s
+	if [[ $hdmg1 -gt 0 ]]
+	then
+		echo "$name deals $hdmg1 dmg and $hdmg2 dmg"
+		echo "Total $hdmg dmg"
+		sleep 1s
+	else	
+		if [[ $hdmg -le 0 ]]
+		then
+			if [[ $eb -le 0 ]]
+			then
+			hdmg=$(( $RANDOM % 5 + 1 ))
+			fi
+		fi
+		poison
+		echo "$name deals $hdmg dmg"
+		sleep 1s
+	fi
+	if [[ $edmg1 -gt 0 ]]
+	then
+		echo "$enemy deals $edmg1 dmg and $edmg2 dmg"
+		echo "Total $edmg dmg"
+		sleep 1s
+	else
+		if [[ $edmg -le 0 ]]
+		then
+			if [[ $hb -le 0 ]] && [[ $dist -lt 1 ]]
+			then
+			edmg=$(( $RANDOM % 5 + 1 ))
+			fi
+		fi
+		epoison
+		echo "$enemy deals $edmg dmg"
+		sleep 1s
+	fi
+	function regen ()
+	{
+	if [[ $regen -gt 0 ]]
+	then
+		sleep 1s
+		reg=$(expr $(expr $regen * $bhp ) / 100 )
+		hp=$(expr $hp + $reg ) 
+		 echo -e "\033[1;32m$name regen $reg hp\033[1;0m"
+		 sleep 1s
+		 if [[ $hp -ge $bhp ]]
+
+			then 
+				hp=$bhp
+		 fi
+	fi
+	
+	if [[ $eregen -gt 0 ]]
+        then
+		sleep 1s
+                ereg=$(expr $(expr $eregen * $behp ) / 100 )
+                hp=$(expr $ehp + $ereg )
+                 echo -e "\033[1;31m$enemy regen $ereg hp\033[1;0m"
+		 sleep 1s
+                 if [[ $ehp -ge $behp ]]
+
+                        then
+                                ehp=$behp
+         	 fi
+        fi
+	}	
+	
+		
+function poisondmg ()
+	{	
+	if [[ $poi -gt 0 ]]
+	then
+	ehp=$(expr $ehp - $poi )
+	
+	echo -e "\033[1;32m$enemy receives $poi poison dmg\033[1;0m"
+	let "poi-=1"
+	sleep 1s
+	fi
+	if [[ $epoi -gt 0 ]]
+		then
+        hp=$(expr $hp - $epoi )
+
+        echo -e "\033[1;31m$name receives $epoi poison dmg\033[1;0m"
+	let "epoi-=1"
+	sleep 1s
+
+        fi
+
+	}
+	regen
+	poisondmg
+	
+function barb ()
+
+	{
+	if [[ $frenzy -gt 0 ]]
+	then
+		fredmg=$(expr $(expr $frenzy * $hdmg ) / 100 )
+		if [[ $fredmg -gt 0 ]]	
+		then
+		hp=$(expr $hp - $fredmg )
+		echo "$name deals $fredmg to yourself in frenzy"
+		fi
+	fi
+	if [[ $lfsteel -gt 0 ]]
+        then
+                lfback=$(expr $(expr $lfsteel * $hdmg ) / 100 )
+                if [[ $lfsteel -gt 0 ]]
+		then
+                hp=$(expr $hp + $lfback )
+                echo "$name steals $lfback hp"
+		if [[ $hp -ge $bhp ]]
+
+                        then
+                                hp=$bhp
+                fi
+
+		sleep 1s
+                fi
+        fi
+
+	}
+	barb
+	hp=$(expr $hp - $edmg )
+  	ehp=$(expr $ehp - $hdmg )
+	echo "$name has $hp hp left"
+	echo "$enemy has $ehp hp left"
+	echo ""
+	sleep 1s
+	let "round+=1"
+}
+
+function ranged ()
+{
+if [[ dist -ge 1 ]]
+then
+echo "$name atacks from distance"
+edmg=0
+
+dmgcalc
+
+fi
+}
+
+dist=0 
 regen=0
 key=0
 h=0
@@ -168,19 +363,23 @@ case "$text" in
 				
 				esac
 ;;
-
+				
 
 "2")
-	class="Shadow"
+
+	class="Ranger"
 	atk=$(( RANDOM % 5 + 1 ))
 	def=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
         hp=$(expr $(( $RANDOM % 25 + 1 )) + 75 )
         block=$(( $RANDOM % 5 + 1 ))
         crit=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
         speed=$(expr $(( $RANDOM % 5 + 1 )) + 10 )
-	regen=$(expr $(( $RANDOM % 2 + 1 ))
-	bpoi=$(( $RANDOM % 2 + 1 )) 
-	;;
+	regen=$(( $RANDOM % 2 + 1 ))
+	bpoi=$(( $RANDOM % 2 + 1 ))
+  	dist=2
+
+;;	
+
 "3")
 	class="Defender"
 	atk=$(( RANDOM % 5 + 1 ))
@@ -210,22 +409,23 @@ blockch=$(expr 5 * $block  )
 function hstats ()
 {
 echo "Your hero stats"
-echo "hp:	$hp"
-echo "atk:	$batk"
-echo "def:	$bdef"
-echo "crit:	$(expr $(expr $bcrit * 5 ) + 5 )%"
-echo "block:	$(expr $(expr $bblock * 5 ) + 5 )%"
-echo "speed:	$bspeed"
-echo "regen:	$regen%"
-echo "poison:	$bpoi"
+echo "hp:		$hp"
+echo "atk:		$batk"
+echo "def:		$bdef"
+echo "crit:		$(expr $(expr $bcrit * 5 ) + 5 )%"
+echo "block:		$(expr $(expr $bblock * 5 ) + 5 )%"
+echo "speed:		$bspeed"
+echo "regen:		$regen%"
+echo "poison:		$bpoi"
 case $class in 
 	"Barbarian")
-echo "Frezny:	$frenzy%"
+echo "frezny:		$frenzy%"
 ;;
 	"Vampire")
-echo "Lifesteal:   $lfsteel%"
+echo "lifesteal		$lfsteel%"
 ;;
-
+	"Ranger")
+echo "distance:		$dist"
 esac
 
 }
@@ -583,6 +783,7 @@ if [[ "$eblock" -lt 20 ]];
                 echo -e "\033[1;31m$enemy blocks your attack\033[1;0m"
 		sleep 1s
         fi
+ranged
 	if [[ "$hblock" -lt 20 ]];
         	then
 			
@@ -648,185 +849,41 @@ if [[ "$eblock" -lt 20 ]];
 		sleep 1s
 	fi
 
-	dmgcalc ()
-	{	
-	sleep 1s
-	if [[ $hdmg1 -gt 0 ]]
-	then
-		echo "$name deals $hdmg1 dmg and $hdmg2 dmg"
-		echo "Total $hdmg dmg"
-		sleep 1s
-	else	
-		if [[ $hdmg -le 0 ]]
-		then
-			if [[ $eb -le 0 ]]
-			then
-			hdmg=$(( $RANDOM % 5 + 1 ))
-			fi
-		fi
-		poison
-		echo "$name deals $hdmg dmg"
-		sleep 1s
-	fi
-	if [[ $edmg1 -gt 0 ]]
-	then
-		echo "$enemy deals $edmg1 dmg and $edmg2 dmg"
-		echo "Total $edmg dmg"
-		sleep 1s
-	else
-		if [[ $edmg -le 0 ]]
-		then
-			if [[ $hb -le 0 ]]
-			then
-			edmg=$(( $RANDOM % 5 + 1 ))
-			fi
-		fi
-		epoison
-		echo "$enemy deals $edmg dmg"
-		sleep 1s
-	fi
-
-	function regen ()
-	{
-	if [[ $regen -gt 0 ]]
-	then
-		sleep 1s
-		reg=$(expr $(expr $regen * $bhp ) / 100 )
-		hp=$(expr $hp + $reg ) 
-		 echo -e "\033[1;32m$name regen $reg hp\033[1;0m"
-		 sleep 1s
-		 if [[ $hp -ge $bhp ]]
-
-			then 
-				hp=$bhp
-		 fi
-	fi
 	
-	if [[ $eregen -gt 0 ]]
-        then
-		sleep 1s
-                ereg=$(expr $(expr $eregen * $behp ) / 100 )
-                hp=$(expr $ehp + $ereg )
-                 echo -e "\033[1;31m$enemy regen $ereg hp\033[1;0m"
-		 sleep 1s
-                 if [[ $ehp -ge $behp ]]
 
-                        then
-                                ehp=$behp
-         	 fi
-        fi
-	}	
-	
+
+if [[ $dist -ge 1 ]]
+then
+
+hspeed=$(expr $(( $RANDOM % 15 + 1 )) + $speed )
+espeed=$(expr $(( $RANDOM % 15 + 1)) + $enspeed )
+                sleep 2s
+                if [[ $hspeed -lt $espeed ]]
+			then
+			let "dist-=1"
+			echo "$enemy moves forward to you"
+			echo "current distance $dist"
+			if [[ $dist -lt 1 ]]
+			then
+			echo "$enemy is now able to attack you"	
+			fi
+		elif [[ $espeed -lt $hspeed ]]
+		then
+			let "dist+=1"
+				if [[ $dist -ge 3 ]]
+				then 
+				dist=3
+				echo "$name reaches MAX possible distance $dist"
+				else
+					echo "$name raises distance to $dist"
+				fi
 		
-function poisondmg ()
-	{	
-	if [[ $poi -gt 0 ]]
-	then
-	ehp=$(expr $ehp - $poi )
-	
-	echo -e "\033[1;32m$enemy receives $poi poison dmg\033[1;0m"
-	let "poi-=1"
-	sleep 1s
-	fi
-	if [[ $epoi -gt 0 ]]
-		then
-        hp=$(expr $hp - $epoi )
-
-        echo -e "\033[1;31m$name receives $epoi poison dmg\033[1;0m"
-	let "epoi-=1"
-	sleep 1s
-
-        fi
-
-	}
-	regen
-	poisondmg
-	
-function barb ()
-
-	{
-	if [[ $frenzy -gt 0 ]]
-	then
-		fredmg=$(expr $(expr $frenzy * $hdmg ) / 100 )
-		if [[ $fredmg -gt 0 ]]	
-		then
-		hp=$(expr $hp - $fredmg )
-		echo "$name deals $fredmg to yourself in frenzy"
 		fi
-	fi
-	if [[ $lfsteel -gt 0 ]]
-        then
-                lfback=$(expr $(expr $lfsteel * $hdmg ) / 100 )
-                if [[ $lfsteel -gt 0 ]]
-		then
-                hp=$(expr $hp + $lfback )
-                echo "$name steals $lfback hp"
-		if [[ $hp -ge $bhp ]]
-
-                        then
-                                hp=$bhp
-                fi
-
-		sleep 1s
-                fi
-        fi
-
-	}
-	barb
-	hp=$(expr $hp - $edmg )
-        ehp=$(expr $ehp - $hdmg )
-
-	echo "$name has $hp hp left"
-	echo "$enemy has $ehp hp left"
-	echo ""
-	sleep 1s
-	let "round+=1"
-}
+else
 
 dmgcalc
-	if [[ "$hp" -le 0 ]]
-	then
-		echo -e "\033[1;5;41m$name loose a battle!!!Game Over!!!\033[1;0m"
-		let "loose+=1"
-		let "score-=3"
-		ending
-	elif [[ "$ehp" -le  0 ]]
-	then
-		echo -e "\033[1;5;32m$name win a battle!!! Congratulations!!!\033[1;0m"
-		let "win+=1"
-		let "score+=3"
-		if [[ $boss -gt 0 ]]
-		then	
-			echo " "
-			reward
-			echo " "
-			reward
-			echo " "
-			reward
-			echo " "
-			boss=0
-		fi
-		
-		luck=$(( $RANDOM % 10 + 1))		
-		poi=0
-		echo " "
-		reward
-		echo " "
-		if [[ $luck -gt 5 ]]
-                then
-                        echo -e "\033[1;32m$name has an extra luck and founds an additional item\033[1;0m"
-			echo " "
-                reward
-			echo " "
-                fi
-
-		hstats
-		echo "SCORE:	$score"
-		cont
-	fi
-
-
-
+fi
+summary
 done
 }
 battle
@@ -845,24 +902,52 @@ case "$rew" in
 			heal=25
 			echo "$name founds a small potion"
 			sleep 1s
+			if [[ $epoi -gt 0 ]]
+			then
+			let "epoi-=10"
+				if [[ epoi -lt 0 ]]
+				then 
+					epoi=0
+				fi
+			fi
+
 		elif [[ $heal -gt 50 ]]
 		then
 			heal=50
                         echo "$name founds a big potion"
 			sleep 1s
+			if [[ $epoi -gt 0 ]]
+                        then
+                        let "epoi-=25"
+				if [[ epoi -lt 0 ]]
+                                then
+                                        epoi=0
+                        	fi
+
+                        fi
+
 		else 
-			echo "$name founds a big potion"
+			echo "$name founds a normal potion"
+			if [[ $epoi -gt 0 ]]
+			then
+                        let "epoi-=20"
+				if [[ epoi -lt 0 ]]
+                                then
+                                        epoi=0
+                                fi
+
 			sleep 1s
+			fi
 		fi
 
 		hp=$(expr $hp + $heal )
 		if [[ $hp -ge $bhp ]]
 		then
 			hp=$bhp
-			echo "$name heals to MAX hp"
+			echo "$name heals to MAX hp and reduces poison to $epoi"
 			sleep 1s
 		else
-			echo "$name heals $heal hp"
+			echo "$name heals $heal hp and reduces poison to $epoi"
 			sleep 1s
 		fi
 		;;
@@ -883,7 +968,7 @@ case "$rew" in
 			"2") 
 				echo "$name founds a normal weapon"
 
-
+0
                                         let "batk+=1"
 				echo "$name atk changes to $batk"
 					sleep 1s
@@ -917,7 +1002,12 @@ case "$rew" in
 		echo "$enemy drops a shield"
                 sleep 1s
                 shd=$(( $RANDOM % 5 + 1 ))
-
+		if [[ $class == "Ranger" ]]
+		then 
+			echo "$name can't use shields"
+			echo "$name sells it for $shd (+$shield score)"
+				let "score+=$shd"
+		else
                 case $shd in
                         "1")
                                 echo "$name founds a cursed shield"
@@ -958,7 +1048,9 @@ case "$rew" in
 					sleep 1s
                                         ;;
                         esac
+		fi
                 ;;
+	
 
 		"4")
 
@@ -1111,28 +1203,62 @@ case "$rew" in
 				esac
 			;;
 	"10")
-		 echo "$enemy dropps healing potion"
-                heal=$(( $RANDOM % $bhp + 1 ))
-                if [[ $heal -lt 25 ]]
-                then
-                        heal=25
-                        echo "$name founds a small potion"
-                elif [[ $heal -gt 50 ]]
-                then
-                        heal=50
-                        echo "$name founds a big potion"
-                else
-                        echo "$name founds a normal potion"
-                fi
+		 echo "$enemy dropps a healing potion"
+		sleep 1s
+		heal=$(( $RANDOM % $bhp + 1 ))
+		if [[ $heal -lt 25 ]]
+		then 
+			heal=25
+			echo "$name founds a small potion"
+			sleep 1s
+			if [[ $epoi -gt 0 ]]
+			then
+			let "epoi-=10"
+				if [[ epoi -lt 0 ]]
+				then 
+					epoi=0
+				fi
+			fi
 
-                hp=$(expr $hp + $heal )
-                if [[ $hp -ge $bhp ]]
-                then
-                        hp=$bhp
-                        echo "$name heals to MAX hp"
-                else
-                        echo "$name heals $heal hp"
-                fi
+		elif [[ $heal -gt 50 ]]
+		then
+			heal=50
+                        echo "$name founds a big potion"
+			sleep 1s
+			if [[ $epoi -gt 0 ]]
+                        then
+                        let "epoi-=25"
+				if [[ epoi -lt 0 ]]
+                                then
+                                        epoi=0
+                        	fi
+
+                        fi
+
+		else 
+			echo "$name founds a normal potion"
+			if [[ $epoi -gt 0 ]]
+			then
+                        let "epoi-=20"
+				if [[ epoi -lt 0 ]]
+                                then
+                                        epoi=0
+                                fi
+
+			sleep 1s
+			fi
+		fi
+
+		hp=$(expr $hp + $heal )
+		if [[ $hp -ge $bhp ]]
+		then
+			hp=$bhp
+			echo "$name heals to MAX hp and reduces poison to $epoi"
+			sleep 1s
+		else
+			echo "$name heals $heal hp and reduces poison to $epoi"
+			sleep 1s
+		fi
                 ;;
 
 
