@@ -1,3 +1,4 @@
+#!/bin/python3
 dist = 0
 regen =0
 key = 0
@@ -25,10 +26,21 @@ bpoi = 0
 ebpoi = 0
 poi = 0
 epoi = 0
+text = ''
+
 def logo ():
     f = open('logo.txt' , 'r')
     file_contents = f.read()
     print (file_contents)
     f.close()
 
-    logo()
+logo()
+def validator ():
+    while text != 'yes':
+        print ('Not the correct choice') 
+        text = input() 
+
+
+text = input("Provide answer: ")
+
+validator()
