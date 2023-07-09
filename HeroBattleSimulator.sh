@@ -62,7 +62,7 @@ sleep 2
 "no")
 	echo ""
 esac
-
+}
 function summary ()
 {
 	if [[ "$hp" -le 0 ]]
@@ -104,8 +104,10 @@ function summary ()
 		then
 			dist=2
 		fi
+		exps
 		hstats
 		echo "SCORE:	$score"
+		
 		cont
 	fi
 }
@@ -206,7 +208,7 @@ function poisondmg ()
 	
 function barb ()
 
-	{
+{
 	if [[ $frenzy -gt 0 ]]
 	then
 		fredmg=$(expr $(expr $frenzy * $hdmg ) / 100 )
@@ -232,8 +234,13 @@ function barb ()
 		sleep 1s
                 fi
         fi
-
-	}
+	if [[ $defl -gt 0 ]]
+	then
+	defldmg=$(expr $(expr $defl * $edmg ) / 100 )
+	ehp=$(expr $ehp - $defldmg )
+	echo "$name deflects $defldmg to $enemy"
+	fi
+}
 	barb
 	hp=$(expr $hp - $edmg )
   	ehp=$(expr $ehp - $hdmg )
@@ -256,6 +263,51 @@ dmgcalc
 fi
 }
 
+function lvup ()
+{
+	let "lv+=1"
+	echo "$name levels up!"
+	case $class in
+		Warrior|Barbarian|Vampire)
+			let "bhp+=10"
+			let "batk+=2"
+			let "bcrit+=1"
+			;;
+		Shadow|Ranger|Assasin)
+			let "bhp+=5"
+			let "bcrit+=1"
+			let "bspeed+=2"
+			;;
+		Defendef|Regenerator|Deflecter)
+			let "bhp+=15"
+			let "bdef+=2"
+			let "bblock+=1"
+			;;
+		"None")
+			let "bhp+=10"
+			let "bdef+=1"
+			let "batk+=1"
+	;;
+	esac
+}
+	
+
+function exps ()
+{	
+	gain=$(expr $behp + $beatk )
+	echo "$name gains $gain exp"
+	let "pkt+=$gain"
+	lvcap=$(expr $lv * 100 )
+	while [ $pkt >= $lvcap ]
+	do 
+		lvup
+	done
+
+
+}
+defl=0
+pkt=0
+lv=1
 dist=0 
 regen=0
 key=0
@@ -287,13 +339,14 @@ then
 fi
 }
 function epoison ()
+{
 if [[ ebpoi -gt 0 ]]
 then
         let "epoi+=$ebpoi"
 fi
 
 }
-svalidator()
+function svalidator () 
 {		
                         while [ "$text" != "1" ] && [ "$text" != "2" ]
 			do
@@ -301,7 +354,7 @@ svalidator()
                 	read -e text
 			done
 }
-cvalidator()
+function cvalidator ()
 {
 	while [ "$text" != "1" ] && [ "$text" != "2" ] && [ "$text" != "3" ] && [ "$text" != "4" ]
 	do 
@@ -321,10 +374,10 @@ case "$text" in
 	class="Warior"
 	atk=$(expr $(( RANDOM % 5 + 1 )) + 10 )
 	def=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
-    	hp=$(expr $(( $RANDOM % 25 + 1 )) + 100 )
+    hp=$(expr $(( $RANDOM % 25 + 1 )) + 100 )
 	block=$(( $RANDOM % 5 + 1))
-    	crit=$(( $RANDOM % 5 + 1 ))
-    	speed=$(( $RANDOM % 5 + 1 ))
+    crit=$(( $RANDOM % 5 + 1 ))
+    speed=$(( $RANDOM % 5 + 1 ))
 	regen=$(( $RANDOM % 2  + 1 ))	
 	echo "Do you want to choose sub-class? Type: yes/no"
 	read -e text
@@ -351,10 +404,10 @@ case "$text" in
 								class="Vampire"
 								atk=$(expr $(( RANDOM % 5 + 1 )) + 10 )
 								def=$(( $RANDOM % 5 + 1 ))
-    								hp=$(expr $(( $RANDOM % 25 + 1 )) + 75 )
+    							hp=$(expr $(( $RANDOM % 25 + 1 )) + 75 )
 								block=$(( $RANDOM % 5 + 1))
-    								crit=0
-    								speed=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
+    							crit=0
+    							speed=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
 								regen=$(( $RANDOM % 2  + 1 ))
 								lfsteel=20
 								;;
@@ -367,31 +420,100 @@ case "$text" in
 
 "2")
 
-	class="Ranger"
+	class="Shadow"
 	atk=$(( RANDOM % 5 + 1 ))
 	def=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
-        hp=$(expr $(( $RANDOM % 25 + 1 )) + 75 )
-        block=$(( $RANDOM % 5 + 1 ))
-        crit=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
-        speed=$(expr $(( $RANDOM % 5 + 1 )) + 10 )
+    hp=$(expr $(( $RANDOM % 25 + 1 )) + 75 )
+    block=$(( $RANDOM % 5 + 1 ))
+    crit=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
+    speed=$(expr $(( $RANDOM % 5 + 1 )) + 10 )
 	regen=$(( $RANDOM % 2 + 1 ))
-	bpoi=$(( $RANDOM % 2 + 1 ))
-  	dist=2
-
+	bpoi=1
+echo "Do you want to choose sub-class? Type: yes/no"
+	read -e text
+	validator
+				case $text in
+						
+						"yes")
+							echo "Which sub-class you want to choose: 1.Assasin, 2.Ranger? Type 1 or 2"
+							read -e text
+							svalidator
+								case $text in
+								"1")
+								class="Assasin"
+								atk=$(expr $(( RANDOM % 5 + 1 )) + 5 )
+								def=$(( $RANDOM % 5 + 1 ))
+    							hp=$(expr $(( $RANDOM % 25 + 1 )) + 75 )
+								block=0
+    							crit=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
+    							speed=$(expr $(( $RANDOM % 5 + 1 )) + 10 )
+								regen=$(( $RANDOM % 2  + 1 ))
+								bpoi=3
+								;;
+								"2") 
+								class="Ranger"
+								atk=$(expr $(( RANDOM % 5 + 1 )) + 5 )
+								def=0
+    							hp=$(expr $(( $RANDOM % 25 + 1 )) + 75 )
+								block=0
+    							crit=$(( $RANDOM % 5 ))
+    							speed=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
+								regen=$(( $RANDOM % 2  + 1 ))
+								dist=2
+								;;
+								esac
+						;;			
+				
+				esac
 ;;	
 
 "3")
 	class="Defender"
 	atk=$(( RANDOM % 5 + 1 ))
 	def=$(expr $(( $RANDOM % 5 + 1 )) + 10 )
-        hp=$(expr $(( $RANDOM % 25 + 1 )) + 125 )
+    hp=$(expr $(( $RANDOM % 25 + 1 )) + 125 )
 	block=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
-        crit=0
-        speed=$(( $RANDOM % 5 + 1 ))
+    crit=0
+    speed=$(( $RANDOM % 5 + 1 ))
 	regen=$(expr $(( $RANDOM % 3 + 1 )) + 2 )
+	echo "Do you want to choose sub-class? Type: yes/no"
+	read -e text
+	validator
+				case $text in
+						
+						"yes")
+							echo "Which sub-class you want to choose: 1.Regenerator, 2.Deflecter? Type 1 or 2"
+							read -e text
+							svalidator
+								case $text in
+								"1")
+								class="Deflecter"
+								atk=0
+								def=$(expr $(( $RANDOM % 5 + 1 )) + 15 )
+    								hp=$(expr $(( $RANDOM % 25 + 1 )) + 150 )
+								block=$(( $RANDOM % 5 + 1 ))
+    								crit=0
+    								speed=$(( $RANDOM % 5 + 1 ))
+								regen=$(( $RANDOM % 2  + 1 ))
+								defl=20
+								;;
+								"2") 
+								class="Regenerator"
+								atk=$(( RANDOM % 5 + 1 ))
+								def=$(expr $(( $RANDOM % 5 + 1 )) + 10 )
+    							hp=$(expr $(( $RANDOM % 25 + 1 )) + 100 )
+								block=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
+    							crit=0
+    							speed=$(( $RANDOM % 5 + 1 ))
+								regen=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
+								;;
+								esac
+						;;			
+				
+				esac
 	;;
 "4")
-	class="none"
+	class="None"
 	atk=$(expr $(( RANDOM % 5 )) + 5 )
 	def=$(expr $(( $RANDOM % 5 + 1 )) + 5 )
 	hp=$(expr $(( $RANDOM % 25 )) + 100 )
@@ -409,6 +531,7 @@ blockch=$(expr 5 * $block  )
 function hstats ()
 {
 echo "Your hero stats"
+echo "lv:		$lv"
 echo "hp:		$hp"
 echo "atk:		$batk"
 echo "def:		$bdef"
@@ -417,15 +540,16 @@ echo "block:		$(expr $(expr $bblock * 5 ) + 5 )%"
 echo "speed:		$bspeed"
 echo "regen:		$regen%"
 echo "poison:		$bpoi"
+echo "exp:		$pkt"
 case $class in 
 	"Barbarian")
-echo "frezny:		$frenzy%"
+echo "frezny:	$frenzy%"
 ;;
 	"Vampire")
-echo "lifesteal		$lfsteel%"
+echo "lifesteal	$lfsteel%"
 ;;
 	"Ranger")
-echo "distance:		$dist"
+echo "distance:	$dist"
 esac
 
 }
@@ -968,7 +1092,7 @@ case "$rew" in
 			"2") 
 				echo "$name founds a normal weapon"
 
-0
+
                                         let "batk+=1"
 				echo "$name atk changes to $batk"
 					sleep 1s
@@ -1266,7 +1390,7 @@ case "$rew" in
 	esac
 	sleep 1s	
 }
-cont()
+function cont ()
 {
 echo "Do you want to fight with a next enemy? (yes/no)"
 text=0
@@ -1289,7 +1413,7 @@ case "$text" in
 	ending
 	esac
 }
-ending()
+function ending ()
 {
         echo "$name Thanks for playing"
         echo "Your record:"
@@ -1323,7 +1447,7 @@ ending()
 	exit 0
 	esac
 }
-gra()
+function gra ()
 
 {
 logo

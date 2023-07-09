@@ -1,100 +1,100 @@
-SuperDuper
-CaptainQuirk
-MegaSocks
-TheNoodleator
-SirFluffington
-DoctorChuckles
-DynamoFro
-WonderFizz
-TheBananana
-LordTicklemeister
-TheJellybeanator
-BaronVonGiggles
-CountChuckleberry
-AwesomeSauce
-MisterBubbles
-LadyGiggleFits
-DashO'Laughter
-TheLaughMaster
-TurboTeehee
-Giggletron
-CaptainChortle
-SirGigglesworth
-DoctorHaHa
-LadySnortzalot
-TheGuffawGal
-ProfessorTeehee
-ChuckleChamp
-BaronBellyLaughs
-MadamMirthful
-CaptainChucklepants
-MisterTeehee
-DoctorSnickers
-LadyTicklebottom
-TheGiggleGenius
-TurboSnicker
-ProfessorGuffaw
-GiggleSnort
-CountLaughula
-DoctorJokesworth
-CaptainGuffawer
-TurboGiggles
-MisterHaHaHa
-LadyChuckleton
-TheSillySpecter
-SirGigglePants
-BaronJokesalot
-DoctorTeehee
-GiggleGadget
-CaptainSnickerdoodle
-TurboTitter
-TheJesterette
-ProfessorGiggleton
-LadyLaughington
-MisterGuffawer
-ChuckleBerryFinn
-DoctorSnickerdoodle
-CountTeehee
-TurboChuckles
-CaptainGigglePants
-ThePunster
-LadyGiggleFingers
-SirChuckletron
-BaronTitter
-DoctorTickleberry
-GiggleGalore
-MisterChortles
-ProfessorSillyPants
-CountGigglesworth
-TurboTitterTots
-CaptainHaHaHa
-TheSillinessSage
-LadyGuffawalot
-SirTeehee
-BaronChuckles
-DoctorSnickerSnack
-GiggleGladiator
-MisterTickleToes
-ProfessorJokesworth
-CountGiggleson
-TurboTeeheeTwister
-CaptainChucklesnort
-TheGagster
-LadyGigglesnort
-SirHaHaHapalooza
-BaronChuckleBerry
-DoctorTeeheeTummy
-GiggleGizmo
-MisterSnickerSnee
-ProfessorJesterella
-CountGigglestix
-TurboTickleMachine
-CaptainLaughsalot
-TheJokester
-LadyGiggleSocks
-SirChucklesworth
-BaronGuffawalot
-DoctorTeeheeTeehee
-GiggleGalaxy
-MisterGiggleMaster
-ProfessorChuckleChamp
+Gnoll
+Rat
+Lizardman
+Goblin
+Orc
+Skeleton
+Zombie
+Bandit
+Giant Spider
+Wolf
+Kobold
+Imp
+Gargoyle
+Harpy
+Ogre
+Troll
+Vampire
+Werewolf
+Minotaur
+Medusa
+Wraith
+Ghost
+Slime
+Mummy
+Demon
+Witch
+Cultist
+Cyclops
+Harpy
+Chimera
+Basilisk
+Giant
+Dark Elf
+Siren
+Golem
+Pixie
+Satyr
+Hydra
+Zombie Dragon
+Specter
+Kraken
+Sahuagin
+Doppelganger
+Gnoll Pack Leader
+Animated Armor
+Shambling Mound
+Hill Giant
+Bugbear
+Dryad
+Mind Flayer
+Gelatinous Cube
+Rust Monster
+Mimic
+Lamia
+Lich
+Wight
+Imp
+Animated Skeleton
+Flesh Golem
+Banshee
+Gorgon
+Nightmare
+Rakshasa
+Sphinx
+Werebear
+Yeti
+Cockatrice
+Fire Elemental
+Water Elemental
+Earth Elemental
+Air Elemental
+Elder Dragon
+Evil Wizard
+Skeleton Archer
+Giant Scorpion
+Vampire Lord
+Necromancer
+Ice Troll
+Dark Knight
+Succubus
+Drow Warrior
+Death Knight
+Hellhound
+Animated Statue
+Ogre Mage
+Goblin Shaman
+Giant Rat King
+Worg
+Spectral Knight
+Animated Tree
+Gnome Inventor
+Elemental Golem
+Mad Alchemist
+Mindless Berserker
+Ancient Undead King
+Abyssal Demon
+Fiery Salamander
+Chaos Spawn
+Enraged Minion
+Plant
