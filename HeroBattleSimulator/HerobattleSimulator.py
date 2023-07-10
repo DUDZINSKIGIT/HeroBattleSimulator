@@ -36,12 +36,13 @@ def logo ():
 
 logo()
 
-def validator ():
+def validator (text):
     while text != 'yes':
         print ('Not the correct choice') 
         text = input() 
+    print ('OK')
 
 
 text = input("Provide answer: ")
 
-validator()
+validator(text)
