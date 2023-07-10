@@ -298,7 +298,7 @@ function exps ()
 	echo "$name gains $gain exp"
 	let "pkt+=$gain"
 	lvcap=$(expr $lv * 100 )
-	while [ $pkt -ge $lvcap ]
+	while [ $pkt >= $lvcap ]
 	do 
 		lvup
 		lvcap=$(expr $lv * 100 )
