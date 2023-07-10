@@ -35,6 +35,7 @@ def logo ():
     f.close()
 
 logo()
+
 def validator ():
     while text != 'yes':
         print ('Not the correct choice') 
