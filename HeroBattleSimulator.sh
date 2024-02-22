@@ -170,7 +170,7 @@ function dmgcalc ()
         then
 		sleep 1s
                 ereg=$(expr $(expr $eregen * $behp ) / 100 )
-                hp=$(expr $ehp + $ereg )
+                ehp=$(expr $ehp + $ereg )
                  echo -e "\033[1;31m$enemy regen $ereg hp\033[1;0m"
 		 sleep 1s
                  if [[ $ehp -ge $behp ]]
