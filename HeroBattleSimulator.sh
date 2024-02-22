@@ -1312,7 +1312,7 @@ case "$rew" in
 					bdef=$(expr $(( RANDOM % $bdef )) + 2 )
 					batt=$(expr $(( RANDOM % $batk )) + 2 )
 					bcrit=$(expr $(( RANDOM % $bcrit )) + 2 )
-					bblock=$(expr $(( RANDOM % $bclock )) + 2 )
+					bblock=$(expr $(( RANDOM % $bblock )) + 2 )
 					bspeed=$(expr $(( RANDOM % $bspeed )) + 2 )
 
 				;;
