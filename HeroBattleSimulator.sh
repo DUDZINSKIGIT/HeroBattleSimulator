@@ -980,10 +980,10 @@ ranged
 if [[ $dist -ge 1 ]]
 then
 
-hspeed=$(expr $(( $RANDOM % 15 + 1 )) + $speed )
-espeed=$(expr $(( $RANDOM % 15 + 1)) + $enspeed )
+hdspeed=$(expr $(( $RANDOM % 15 + 1 )) + $speed )
+edspeed=$(expr $(( $RANDOM % 15 + 1)) + $enspeed )
                 sleep 2s
-                if [[ $hspeed -lt $espeed ]]
+                if [[ $hdspeed -lt $edspeed ]]
 			then
 			let "dist-=1"
 			echo "$enemy moves forward to you"
@@ -992,7 +992,7 @@ espeed=$(expr $(( $RANDOM % 15 + 1)) + $enspeed )
 			then
 			echo "$enemy is now able to attack you"	
 			fi
-		elif [[ $espeed -lt $hspeed ]]
+		elif [[ $edspeed -lt $hdspeed ]]
 		then
 			let "dist+=1"
 				if [[ $dist -ge 3 ]]
